@@ -20,18 +20,9 @@ class TemplateSource {
     }
 
 /*
-    The getResumesDriver function is how a Provider will interact with a Source.
-    getResumesDriver should return an array of Resume objects
-*/
-    async getResumesDriver() {
-        const resumes = await this.getResumes();
-        if (typeof resumes != Array) throw new Error('getResumes return type is not array, is type %O', typeof resumes);
-        
-        return resumes;
-    }
-
-/*
-    The getResumes function is implemented by Source children 
+    The getResumes function is how a Provider will interact with a Source.
+    getResumes should be overridden by child Sources
+    getResumes should return an array of Resume objects
 */
     async getResumes() {
 

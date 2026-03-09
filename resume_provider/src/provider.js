@@ -6,19 +6,26 @@ export default class ResumeProvider {
         this.url = url;
     }
 
-    async provideResumes(resumeSource) {
+    static async getResumesFromSource(resumeSource) {
+        const resumes = await resumeSource.getResumesDriver();
 
-        // get the resumes
-        const resumes = await resumeSource.getResumes();
+        if (resumes == null) throw new Error('null return from resume source');
+        if (typeof resumes != typeof Array) throw new Error('return from resume source was not type Array, was type %O', typeof resumes);
+
+        return resumes;
+    }
+
+    static async uploadResumesToRemote(url, resumes) {
         
-        // post them to the server
+        // upload data to the remote server
         const response = await axios.post(
-            this.url,
+            url,
             resumes
         );
 
-        // pivot on server response
-        if (response.status < 300) console.log('successfully sent resumes');
-        else console.log('encountered error %O', response.data.error);
+        if (response.status < 300) return true;
+
+        console.log('encountered error\n', response.data.error);
+        return false;
     }
 }
