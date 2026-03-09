@@ -15,9 +15,11 @@ server.get('/google', async (req, res) => {
     const resumes = await ResumeProvider.getResumesFromSource(source);
 
     // now send to the remote server
-    const didPush = await ResumeProvider.uploadResumesToRemote(REMOTE_URL, resumes);
+    const didUpload = await ResumeProvider.uploadResumesToRemote(REMOTE_URL, resumes);
     
-    const status = didPush ? 200 : 400;
+    // status is based on if the resumes did upload to the server
+    const status = didUpload ? 200 : 400;
 
+    // return the status
     return res.status(status);
 });
