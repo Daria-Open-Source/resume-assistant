@@ -9,7 +9,7 @@ const REMOTE_URL = 'http://localhost:3000';
 server.get('/google', async (req, res) => {
     
     // initialize the dependency to inject
-    const source = GoogleDriveSource();
+    const source = new GoogleDriveSource();
 
     // get the resumes from the dependency
     const resumes = await ResumeProvider.getResumesFromSource(source);
