@@ -1,31 +1,16 @@
-import axios from 'axios';
-
+// Defines an interface for interacting with sources of resume data
 export default class ResumeProvider {
 
-    constructor(url = 'http://localhost:3000') {
-        this.url = url;
-    }
+    // should be essentially static
+    constructor() {}
 
+    // gets resume binary data
     static async getResumesFromSource(resumeSource) {
-        const resumes = await resumeSource.getResumesDriver();
+        const { binaries, metadata } = await resumeSource.getResumes();
 
-        if (resumes == null) throw new Error('null return from resume source');
-        if (typeof resumes != typeof Array) throw new Error('return from resume source was not type Array, was type %O', typeof resumes);
+        // if (resumes == null) throw new Error('null return from resume source');
+        // if (typeof resumes != typeof Array) throw new Error(`return from resume source was not type Array, was type ${typeof resumes}`);
 
-        return resumes;
-    }
-
-    static async uploadResumesToRemote(url, resumes) {
-        
-        // upload data to the remote server
-        const response = await axios.post(
-            url,
-            resumes
-        );
-
-        if (response.status < 300) return true;
-
-        console.log('encountered error\n', response.data.error);
-        return false;
+        return { binaries, metadata };
     }
 }

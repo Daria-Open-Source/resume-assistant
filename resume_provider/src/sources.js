@@ -12,9 +12,7 @@ class TemplateSource {
     The Children implement specific methods unique to their repository 
 */
 
-/*
-     
-*/
+    // identifies the source
     constructor(sourceName) {
         this.source = sourceName;
     }
@@ -22,7 +20,7 @@ class TemplateSource {
 /*
     The getResumes function is how a Provider will interact with a Source.
     getResumes should be overridden by child Sources
-    getResumes should return an array of Resume objects
+    getResumes should return an array of jsons, with a buffer field for representing the pdf in binary
 */
     async getResumes() {
 
@@ -32,12 +30,12 @@ class TemplateSource {
 export class GoogleDriveSource extends TemplateSource {
     constructor(sourceName = 'Google Drive') {
         super(sourceName);
+        this.folderId = '1_EWuPrjRmbMoJitZfFOTBINQgqxare1m';
 
         // the auth variable references a service key, which is associated with a service account
         // service accounts can use resources on behalf of a user. This account can only use the Drive API
         this.auth = new google.auth.GoogleAuth({
-            keyFile: `service_keys\\daria-484521-b2af964deca3.json`,
-            scopes: ['https://www.googleapis.com/auth/cloud-platform']
+            scopes: ['https://www.googleapis.com/auth/drive']
         });
 
         this.drive = google.drive({ version: 'v3', auth: this.auth });
@@ -45,28 +43,36 @@ export class GoogleDriveSource extends TemplateSource {
 
     async getResumes() {
         
-        let resumes = [];
+        let binaries = [];
+        let metadata = [];
 
+        // gets files from a subfolder called resumes
         const response = await this.drive.files.list({
-            fields: 'files(id, name)'
+            fields: 'files(id, name, parents)',
+            supportsAllDrives: true,
+            includeItemsFromAllDrives: true,
         });
 
-        const files = response.data.files;
-        for (const f in files) {
+        console.log(response.data.files);
+
+        // for each file, download and save it to the array 
+        const files = response.data.files.filter(f => f.name.endsWith('.pdf'));
+        for (const f of files) {
             
             // fetch procedure
             const pdf = await this.drive.files.get({ 
                 fileId: f.id,
-                alt: 'media'
+                alt: 'media',
+                supportsAllDrives: true,
             }, { responseType: 'arraybuffer' });
             
             // save procedure
-            resumes.push({
-                fileName: f.name,
-                data: pdf.data
+            binaries.push(Buffer.from(pdf.data));
+            metadata.push({
+                name: f.name,
             });
         }
 
-        return resumes;
+        return { binaries, metadata };
     }
 }

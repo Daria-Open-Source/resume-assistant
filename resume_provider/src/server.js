@@ -1,25 +1,40 @@
 import express from 'express';
+import FormData from 'form-data';
 
-import ResumeProvider from './provider';
-import { GoogleDriveSource } from './sources';
+import ResumeProvider from './provider.js';
+import { GoogleDriveSource } from './sources.js';
 
 const server = express();
-const REMOTE_URL = 'http://localhost:3000';
 
 server.get('/google', async (req, res) => {
     
     // initialize the dependency to inject
     const source = new GoogleDriveSource();
 
-    // get the resumes from the dependency
-    const resumes = await ResumeProvider.getResumesFromSource(source);
-
-    // now send to the remote server
-    const didUpload = await ResumeProvider.uploadResumesToRemote(REMOTE_URL, resumes);
+    // get data
+    const { binaries, metadata } = await ResumeProvider.getResumesFromSource(source);
+    console.log(binaries);
+    console.log(metadata);
     
-    // status is based on if the resumes did upload to the server
-    const status = didUpload ? 200 : 400;
+    // data will be sent as multiform response
+    const form = new FormData();
+    
+    // add each pdf
+    binaries.forEach((binary, index) => form.append(
+        `resume_${index + 1}`, binary, 
+        {
+            filename: metadata[index].name,
+            contentType: 'application/pdf',
+            knownLength: binary.length
+        })
+    );
 
-    // return the status
-    return res.status(status);
+    // add each metadata tag
+    metadata.forEach((tag, index) => form.append(`tag_${index + 1}`, JSON.stringify(tag)));
+
+    // return the data as a multipart form object
+    res.setHeader('Content-Type', `multipart/form-data; boundary=${form.getBoundary()}`);
+    form.pipe(res);
 });
+
+export default server;
