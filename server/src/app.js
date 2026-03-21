@@ -1,5 +1,7 @@
-// server/src/server.ts
-import { ResumeService } from './resumes/service.ts';
+import express from 'express';
+import apiRouter from './routers/api.router';
 
-const resumeService = ResumeService.getInstance();
-resumeService.startCron();
+const app = express();
+app.use('/api', apiRouter);
+
+export default app;
