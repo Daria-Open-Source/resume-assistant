@@ -91,13 +91,19 @@ export class GroqLanguageModel extends TemplateLanguageModel{
 
     async executePrompt() {
 
+      
+        // initializes fields
         const query = this.query;
         const documents = this.documents;
         const prompt = this.prompt;
 
+
+        // guard that prevents missing fields
         if (null in [query, documents, prompt])
             throw new Error('run .preparePrompt() before executing!');
 
+
+        // execute response to groq server
         const response = await this.client.chat.completions.create({
             model: 'llama-3.3-70b-versatile',
             messages: [

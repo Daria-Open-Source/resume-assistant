@@ -12,6 +12,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "@huggingface/transformers": "^3.8.1",
     "axios": "^1.13.6",
     "busboy": "^1.6.0",
     "dotenv": "^17.3.1",
