@@ -4,7 +4,7 @@ let embedder = null;
 //Starter code for embedder, CHANGE THIS FILE AS NECCESARY
 const getEmbedder = async () => {
     if (!embedder) {
-        embedder = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+        embedder = 
     }
     return embedder;
 };
