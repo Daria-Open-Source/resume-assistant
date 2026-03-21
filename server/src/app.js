@@ -1,7 +1,11 @@
 import express from 'express';
-import apiRouter from './routers/api.router';
+
+// routers
+import ragRouter from './routers/rag.router.js'
+import utilRouter from './routers/util.router';
 
 const app = express();
-app.use('/api', apiRouter);
+app.use('/api/rag', ragRouter);
+app.use('/api/util', utilRouter);
 
 export default app;
