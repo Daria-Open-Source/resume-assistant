@@ -1,4 +1,4 @@
-const { pipeline } = require('@xenova/transformers');
+
 let embedder = null;
 
 //Starter code for embedder, CHANGE THIS FILE AS NECCESARY

@@ -1,40 +1,34 @@
+import PipeFactory from "../pipeline/factory";
+
 /*
     The TemplateJob interface defines several functions for interaction
     -> constructor()    : pass a reference to a driver function associated with the job
     -> runJob()         : executes the driver reference
     -> 
 */
-class TemplateJob {
+export class Job {
 
     // takes a driver function for a specfic job to execute
-    constructor(cronTab, jobRunner, jobParser, jobSaver) {
+    constructor(cronTab, pipelineConfig) {
         
         // validates each driver
-        [jobRunner, jobParser, jobSaver].map(fn => this._validateDriver(fn))
+        // this._validateConfig(pipelineConfig);
         
-        this.pipeline = Pipeline(jobRunner, jobParser, jobSaver);
-        this.data = null;
+        this.pipeline = PipeFactory.buildPipeline(pipelineConfig);
+        this.cronTab = cronTab;
     }
 
-    _validateDriver(jobRunner) {
-        
-        if (typeof jobRunner != typeof Function)
-            throw new Error('Job classes take a function to execute a job');
+    _validateConfig(config) {
+
+        // guards on type
+        if (typeof config != typeof JSON)
+            throw new Error('The config argument is a json');
+
+        // validates key names
+        if (!Object.keys(JSON).every(key => key == 'pipename'))
+            throw new Error('All config keys must be "pipename"');
+
     }
     
-    async runJob() { this.data = await this.driver(); }
-    async saveJob() {}
-}
-
-class Pipe {
-    /*
-        A pipeline involves three steps:
-        1. extracts data from a source (might involve a web request)
-        2. parse/clean/transform into a format easy for insertion
-        3. saves the data to a collection reference
-    */
-    constructor(inMethod, outMethod) {
-
-    }
-
+    async run() { return await this.pipeline.forward(); }
 }

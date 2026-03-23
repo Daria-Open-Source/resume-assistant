@@ -13,8 +13,8 @@ server.get('/google', async (req, res) => {
 
     // get data
     const { binaries, metadata } = await ResumeProvider.getResumesFromSource(source);
-    console.log(binaries);
-    console.log(metadata);
+    // console.log(binaries);
+    // console.log(metadata);
     
     // data will be sent as multiform response
     const form = new FormData();
