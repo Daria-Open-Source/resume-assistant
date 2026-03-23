@@ -1,6 +1,8 @@
 import BusBoy from 'busboy';
+import { PDFDocument } from 'pdf-lib';
+import { PDFParse } from 'pdf-parse';
 
-async function parse(stream, headers) {
+async function multiform(stream, headers) {
 
     // get parser instance
     const parser = BusBoy({ headers });
@@ -57,8 +59,38 @@ async function parse(stream, headers) {
 export const parseMultiform = async (responseStream, headers) => {
     // We simply wrap the process in a promise to ensure it's awaitable
     return new Promise((resolve, reject) => {
-        parse(responseStream, headers)
+        multiform(responseStream, headers)
             .then(resolve)
             .catch(reject);
     });
 };
+
+const binaryToText = async (buffer) => {
+    
+    // note: uses a different library for text extraction
+    const parser = new PDFParse({ data: buffer });
+    const page = await parser.getText();
+    return page.text;
+};
+
+// use this in the future for editing the pdf
+const binaryToPDF = async (buffer) => {
+    const pdf = new PDFDocument.load(buffer);
+};
+
+export const parseBinaryPDFs = async (resumeBuffers) => {
+    
+    let parsed = [];
+    for (const buffer of resumeBuffers) {
+        
+        // run parsing functions
+        const pdfText = await binaryToText(buffer);   
+        
+        // store data as json in array
+        parsed.push({
+            'text': pdfText
+        });
+    }
+
+    return parsed;
+}

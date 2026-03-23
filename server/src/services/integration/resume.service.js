@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { parseMultiform } from './parser.service.js';
+import { parseMultiform, parseBinaryPDFs } from './parser.service.js';
 
 export const getResumesAsBinary = async () => {
 
@@ -15,4 +15,6 @@ export const getResumesAsBinary = async () => {
 };
 
 const results = await getResumesAsBinary();
-console.log(results);
+const buffers = Object.values(results.files);
+const parsed = await parseBinaryPDFs(buffers);
+console.log(parsed);
