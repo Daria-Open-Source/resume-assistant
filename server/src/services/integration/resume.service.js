@@ -1,5 +1,6 @@
+import 'dotenv/config';
 import axios from 'axios';
-import { parseMultiform, parseBinaryPDFs } from './parser.service.js';
+import { parseMultiform, parseBinaryPDFs, splitResumes } from './parser.service.js';
 
 export const getResumesAsBinary = async () => {
 
@@ -17,4 +18,5 @@ export const getResumesAsBinary = async () => {
 const results = await getResumesAsBinary();
 const buffers = Object.values(results.files);
 const parsed = await parseBinaryPDFs(buffers);
-console.log(parsed);
+const split = await splitResumes(parsed.map(p => p.text));
+console.log(split);
