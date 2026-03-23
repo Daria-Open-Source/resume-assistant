@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { parseMultiform, parseBinaryPDFs, splitResumes } from './parser.service.js';
+import { parseMultiform } from '../extraction/parser.service.js';
 
 export const getResumesAsBinary = async () => {
 
@@ -14,9 +14,3 @@ export const getResumesAsBinary = async () => {
     // Pass the stream AND the headers (which contain the boundary)
     if (response.status === 200) return await parseMultiform(response.data, response.headers);
 };
-
-const results = await getResumesAsBinary();
-const buffers = Object.values(results.files);
-const parsed = await parseBinaryPDFs(buffers);
-const split = await splitResumes(parsed.map(p => p.text));
-console.log(split);

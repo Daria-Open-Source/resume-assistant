@@ -2,7 +2,7 @@ import express from 'express';
 
 // routers
 import ragRouter from './routers/rag.router.js'
-import utilRouter from './routers/util.router';
+import utilRouter from './routers/util.router.js';
 
 const app = express();
 app.use('/api/rag', ragRouter);

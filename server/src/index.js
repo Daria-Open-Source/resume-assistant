@@ -1,7 +1,6 @@
 import 'dotenv/config';
 import app from './app.js';
-import { ResumeService } from './service.ts';
+import { scheduleJobs } from './config.js';
 
-const resumeService = ResumeService.getInstance();
-resumeService.startCron();
-app.listen(() => console.log('check status on /api/util/health'));
+scheduleJobs();
+app.listen(3000, () => console.log('check status on /api/util/health'));

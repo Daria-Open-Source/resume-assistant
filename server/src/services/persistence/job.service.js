@@ -1,3 +1,7 @@
+import 'dotenv/config';
+import { getResumesAsBinary } from "../integration/resume.service.js"
+import { parseBinaryPDFs, splitResumes } from '../extraction/parser.service.js';
+
 /*
     The TemplateJob interface defines several functions for interaction
     -> constructor()    : pass a reference to a driver function associated with the job
@@ -29,16 +33,56 @@ export class Job {
 
     }
     
-    async run() { 
+    async runJob() { 
 
-        const output = null;
+        let output = null;
 
-        // feeds output into next task function
-        this.tasks.map(async (t) => {
+        // wait for each task to finish
+        // then feed output into the next
+        for (const t of this.tasks) {
+
+            // either initialize output or feed it
             if (output == null) output = await t();
             else                output = await t(output);
-        });
+        }
+        
 
         return output;
     }
-}
+};
+
+export class ResumeJob extends Job {
+    constructor() {
+
+        let jobs = [];
+        let tab = '0 * * * *';
+        let metadata = null;
+        let pdfs = null;
+
+        // reads the binary stream from resume_provider
+        jobs.push(getResumesAsBinary);
+
+        // middleware that saves file metadata, pushes buffers along
+        jobs.push((filesAsBinary) => {
+            return Object.values(filesAsBinary.files);
+        });
+
+        // turns buffers into jsons of text
+        jobs.push(parseBinaryPDFs);
+
+        // saves the json, pushes the raw text array along
+        jobs.push((parsedPDFs) => {
+            pdfs = parsedPDFs;
+            return parsedPDFs.map(pdf => pdf.text);    
+        });
+
+        // split the raw text into sections
+        jobs.push(splitResumes);
+
+        super(tab, jobs);
+    }
+};
+
+const resJob = new ResumeJob();
+const chunks = await resJob.runJob();
+console.log(chunks);

@@ -1,16 +1,11 @@
-import Scheduler from "./services/integration/scheduler.service"
-import { Job } from "./services/persistence/job.service";
-import { getResumesAsBinary } from "./services/integration/resume.service";
-import { parseBinaryPDF } from "./services/integration/parser.service";
+import Scheduler from "./services/integration/scheduler.service.js"
+import { ResumeJob } from "./services/persistence/job.service.js";
 
-export const scheduleJobs = async () => {
 
-    const resumeTasks = [
-        getResumesAsBinary,
-        parseBinaryPDF
-    ]
-    const resumeJob = new Job('0 * * * *', resumeTasks);
+export const scheduleJobs = () => {
+
+    const jobs = [new ResumeJob()];
     
-    const scheduler = new Scheduler([resumeJob]);
+    const scheduler = new Scheduler(jobs);
     scheduler.scheduleJobs();
 };
