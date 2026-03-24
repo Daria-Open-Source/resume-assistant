@@ -85,7 +85,7 @@ class TemplateLanguageModel {
     async executePrompt() {}
 };
 
-export class GroqLanguageModel extends TemplateLanguageModel{
+export class GroqLanguageModel extends TemplateLanguageModel {
 
     constructor() { super(new Groq({ apiKey: process.env.GROQ_API_KEY })); }
 
@@ -114,7 +114,7 @@ export class GroqLanguageModel extends TemplateLanguageModel{
         });
 
         const rawText = response.choices[0].message.content;
-        const cleanedText = cleanedResponse(rawText);
+        const cleanedText = this.cleanResponse(rawText);
         return cleanedText;
     }
 

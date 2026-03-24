@@ -14,7 +14,6 @@ export const doQuery = async (userQuery) => {
 
     // vectorize the user query
     const vectorizedQuery = await Embedder.embed([userQuery]);
-    console.log(vectorizedQuery);
 
     // parse their resume to build more context??
     // this step can infer a major, and likely targeted roles 
