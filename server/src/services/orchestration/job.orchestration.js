@@ -46,7 +46,6 @@ export class Job {
             else                output = await t(output);
         }
         
-
         return output;
     }
 };
