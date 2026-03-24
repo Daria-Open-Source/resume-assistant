@@ -1,13 +1,13 @@
 import { MixedBreadEmbeddingModel } from "../integration/embedding.integration.js";
 import { GroqLanguageModel } from '../integration/llm.integration.js'
-import { VectorStore } from "./vectorStore.orchestration.js";
+import { VectorStore } from "../persistence/vectorStore.persistence.js";
+
+// Make objects
+const Embedder = new MixedBreadEmbeddingModel();
+const LLM = new GroqLanguageModel();
+const Store = new VectorStore();
 
 export const doQuery = async (userQuery) => {
-
-    // initialize objects
-    const Embedder = new MixedBreadEmbeddingModel();
-    const LLM = new GroqLanguageModel();
-    const Store = new VectorStore();
 
     // connect services
     await Embedder.initialize();
@@ -22,8 +22,8 @@ export const doQuery = async (userQuery) => {
     
     // run the query on the vector store
     const kDocsPerSection = await Store.vectorSearch(
-        vectorizedQuery,
-        5
+        vectorizedQuery,        // vector used in similarity search
+        5                       // controls the # of results to return in each section
     );
 
     // Call the LLM

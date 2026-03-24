@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darya Alpha - Resume Upload Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
+        form { max-width: 400px; border: 1px solid #ccc; padding: 20px; border-radius: 8px; }
+        div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="file"] { width: 100%; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h2>Resume Upload Test</h2>
+    <form action="http://localhost:3000/api/rag/query" method="POST" enctype="multipart/form-data">
+        
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" placeholder="e.g. jhebbel" required>
+        </div>
+
+        <div>
+            <label for="query">Search Query:</label>
+            <input type="text" id="query" name="query" placeholder="e.g. Software Engineer" required>
+        </div>
+
+        <div>
+            <label for="resume">Resume (PDF):</label>
+            <input type="file" id="resume" name="resume" accept="application/pdf" required>
+        </div>
+
+        <button type="submit">Upload to Backend</button>
+    </form>
+
+    <p><small>Check your Node.js console after clicking submit to see the parsed buffer.</small></p>
+
+</body>
+</html>

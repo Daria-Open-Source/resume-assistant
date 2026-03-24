@@ -8,12 +8,12 @@ class TemplateModelService {
     async find(filters = null) { return await this.model.find(filters); }
     async findOneById(id) { return await this.model.findOneById(id); }
 
-    async insert(data) { 
-        await this.model(data);
-        return this.model.save(); 
+    async insertOne(data) { 
+        const item = await this.model(data);
+        return this.model.save(item); 
     }
 
-    async updateOneById(data, id) { return await this.model.findByIdAndReplace(id, data); }
+    async updateOneById(data, id) { return await this.model.findByIdAndUpdate(id, data); }
     async deleteOneById(id) { return await this.model.findByIdAndDelete(id); }
 };
 
