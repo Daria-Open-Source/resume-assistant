@@ -1,6 +1,6 @@
-import { HuggingFaceEmbeddingModel } from "../integration/embedding.service.js";
-import { GroqLanguageModel } from '../integration/llm.service.js'
-import { VectorStore } from "./vectorStore.service.js";
+import { HuggingFaceEmbeddingModel } from "../integration/embedding.integration.js";
+import { GroqLanguageModel } from '../integration/llm.integration.js'
+import { VectorStore } from "./vectorStore.orchestration.js";
 
 export const doQuery = async (userQuery) => {
 

@@ -1,7 +1,7 @@
 import cron from 'node-cron';
-import { Job } from '../persistence/job.service.js';
+import { Job } from './job.orchestration.js'; 
 
-export default class Scheduler {
+export class Scheduler {
     constructor(jobsList) {
         this._validateList(jobsList);
         this.jobs = jobsList;

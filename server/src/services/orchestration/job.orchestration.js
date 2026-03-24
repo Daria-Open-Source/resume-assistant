@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { getResumesAsBinary } from "../integration/resume.service.js"
-import { parseBinaryPDFs, splitResumes } from '../extraction/parser.service.js';
+import { parseBinaryPDFs, splitResumes } from '../utility/parser.utility.js';
 
 /*
     The TemplateJob interface defines several functions for interaction
@@ -82,7 +82,3 @@ export class ResumeJob extends Job {
         super(tab, jobs);
     }
 };
-
-const resJob = new ResumeJob();
-const chunks = await resJob.runJob();
-console.log(chunks);

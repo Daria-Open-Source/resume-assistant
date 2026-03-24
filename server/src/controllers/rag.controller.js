@@ -1,4 +1,4 @@
-import RAG from '../services/orchestration/rag.service.js';
+import RAG from '../services/orchestration/rag.orchestration.js';
 
 /*
     Controller for the query. 

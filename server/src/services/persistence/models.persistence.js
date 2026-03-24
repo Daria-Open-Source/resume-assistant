@@ -1,0 +1,24 @@
+import { Chunk } from "../../models/chunks.model";
+
+class TemplateModelService {
+
+    // set this persistence service's mongoose model
+    constructor(model) { this.model = model; }
+
+    async find(filters = null) { return await this.model.find(filters); }
+    async findOneById(id) { return await this.model.findOneById(id); }
+
+    async insert(data) { 
+        await this.model(data);
+        return this.model.save(); 
+    }
+
+    async updateOneById(data, id) { return await this.model.findByIdAndReplace(id, data); }
+    async deleteOneById(id) { return await this.model.findByIdAndDelete(id); }
+};
+
+// wrapper of utilities for the chunk collection
+export class ChunkService extends TemplateModelService {
+    constructor() { super(Chunk); }
+};
+

@@ -1,4 +1,4 @@
-import { Chunk } from "../persistence/chunk.service"
+import { Chunk } from "../persistence/chunk.persistence"
 
 export class VectorStore {
 
