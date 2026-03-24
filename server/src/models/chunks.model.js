@@ -18,4 +18,4 @@ const ResumeChunkSchema = new mongoose.Schema({
     }
 });
 
-export const Chunk = new mongoose.Model('Chunk', ResumeChunkSchema);
+export const Chunk = new mongoose.model('Chunk', ResumeChunkSchema);

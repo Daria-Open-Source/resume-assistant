@@ -1,6 +1,8 @@
 import { Router } from "express";
+import { parseClientMultiform } from "../middlewares/parsing.middleware.js";
+import { runQuery } from "../controllers/rag.controller.js";
 
 const ragRouter = Router();
-ragRouter.post('/query', (req, res) => res.status(500).json({ 'error': 'not implemented' }));
+ragRouter.post('/query', parseClientMultiform, runQuery);
 
 export default ragRouter;

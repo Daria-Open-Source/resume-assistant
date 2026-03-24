@@ -9,6 +9,9 @@ export const doQuery = async (userQuery) => {
     const LLM = new GroqLanguageModel();
     const Store = new VectorStore();
 
+    // connect services
+    await Embedder.initialize();
+
     // vectorize the user query
     const vectorizedQuery = await Embedder.embed([userQuery]);
     

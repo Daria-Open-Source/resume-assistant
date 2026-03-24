@@ -25,7 +25,9 @@ class TemplateEmbeddingModel {
 export class HuggingFaceEmbeddingModel extends TemplateEmbeddingModel {
 
     constructor() { super(null); }
-    async initialize() { this.client = await pipeline('feature-extraction', 'Xenova-allMiniLm-L6-v2'); }
+    async initialize() { this.client = await pipeline('feature-extraction', 'Xenova-allMiniLm-L6-v2', {
+        auth_token: process.env.HF_TOKEN
+    }); }
     async _embedImplementation(documents) {
         return await this.client(documents);
     }

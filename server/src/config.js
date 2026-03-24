@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import Scheduler from "./services/orchestration/scheduler.orchestration.js"
+import { Scheduler} from "./services/orchestration/scheduler.orchestration.js"
 import { ResumeJob } from "./services/orchestration/job.orchestration.js";
 
 // connects the mongoose schemas to the mongo database
@@ -17,5 +17,6 @@ const scheduleJobs = () => {
 
 export const setupApp = async () => {
     await connectToMongo();
-    scheduleJobs();
+    console.log('connected to mongodb');
+    // scheduleJobs();
 };

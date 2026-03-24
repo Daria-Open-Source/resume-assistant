@@ -1,4 +1,4 @@
-import { Chunk } from "../../models/chunks.model";
+import { Chunk } from "../../models/chunks.model.js";
 
 class TemplateModelService {
 
