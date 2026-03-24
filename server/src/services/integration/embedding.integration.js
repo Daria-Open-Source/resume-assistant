@@ -1,4 +1,5 @@
 import { pipeline } from '@huggingface/transformers';
+import axios from 'axios';
 
 /* 
     TemplateEmbeddingModel exposes functions to be called by users
@@ -12,7 +13,7 @@ class TemplateEmbeddingModel {
     async embed(documents) {
         if (!Array.isArray(documents))
             throw new Error('X_EmbeddingModel.embed expects input of type Array');
-        return await this._embedImplementation();
+        return await this._embedImplementation(documents);
     }
     async _embedImplementation(documents) {}
 };
@@ -31,4 +32,32 @@ export class HuggingFaceEmbeddingModel extends TemplateEmbeddingModel {
     async _embedImplementation(documents) {
         return await this.client(documents);
     }
+};
+
+export class MixedBreadEmbeddingModel extends TemplateEmbeddingModel {
+    constructor() { 
+        super(null); 
+        this.key = process.env.MIXEDBREAD_API_KEY;
+        this.url = 'https://api.mixedbread.com/v1/embeddings';
+    }
+    
+    async initialize() { this.client = axios.post; }
+    async _embedImplementation(documents) {
+
+        const response = await this.client(this.url, {
+            model: 'mixedbread-ai/mxbai-embed-large-v1',
+            input: documents,
+            normalized: true,
+            encoding_format: 'float'
+        },
+        {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${this.key}`
+            },
+        });
+            
+        return response.data.data.map(item => item.embedding);
+    }
+
 };
