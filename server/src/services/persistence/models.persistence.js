@@ -1,4 +1,4 @@
-import { Chunk } from "../../models/chunks.model.js";
+import { ChunkModel } from "../../models/chunks.model.js";
 
 class TemplateModelService {
 
@@ -19,6 +19,6 @@ class TemplateModelService {
 
 // wrapper of utilities for the chunk collection
 export class ChunkService extends TemplateModelService {
-    constructor() { super(Chunk); }
+    constructor() { super(ChunkModel); }
 };
 

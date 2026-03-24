@@ -4,6 +4,7 @@ import { parseMultiform } from '../utility/parser.utility.js';
 
 export const getResumesAsBinary = async () => {
 
+    console.log('calling remote server');
     // resume microservice configs
     const url = 'http://localhost:5000';
     const source = 'google';

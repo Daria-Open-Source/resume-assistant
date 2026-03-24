@@ -1,13 +1,25 @@
 import 'dotenv/config';
 import { getResumesAsBinary } from "../integration/resume.integration.js"
-import { parseBinaryPDFs, splitResumes } from '../utility/parser.utility.js';
+import { chunkResumes, parseBinaryPDFs } from '../utility/parser.utility.js';
+import { MixedBreadEmbeddingModel } from '../integration/embedding.integration.js';
+import { VectorStore } from '../persistence/vectorStore.persistence.js';
 
+
+// const Embedder = new MixedBreadEmbeddingModel();
+//const Store = new VectorStore();
+
+// await Embedder.initialize();
 /*
     The TemplateJob interface defines several functions for interaction
     -> constructor()    : pass a reference to a driver function associated with the job
     -> runJob()         : executes the driver reference
     -> 
 */
+
+const Embedder = new MixedBreadEmbeddingModel();
+await Embedder.initialize();
+
+
 export class Job {
 
     // takes a driver function for a specfic job to execute
@@ -39,8 +51,8 @@ export class Job {
 
         // wait for each task to finish
         // then feed output into the next
-        for (const t of this.tasks) {
 
+        for (const t of this.tasks) {
             // either initialize output or feed it
             if (output == null) output = await t();
             else                output = await t(output);
@@ -55,29 +67,31 @@ export class ResumeJob extends Job {
 
         let jobs = [];
         let tab = '0 * * * *';
-        let metadata = null;
-        let pdfs = null;
 
-        // reads the binary stream from resume_provider
-        jobs.push(getResumesAsBinary);
-
-        // middleware that saves file metadata, pushes buffers along
-        jobs.push((filesAsBinary) => {
-            return Object.values(filesAsBinary.files);
+        // 1. Fetching Data
+        jobs.push(async ctx => {
+            const data = await getResumesAsBinary();
+            ctx.buffers = Object.values(data.files);
+            ctx.fnames = Object.values(data.metadata);
         });
 
-        // turns buffers into jsons of text
-        jobs.push(parseBinaryPDFs);
+        // 2. Parsing (No return needed!)
+        jobs.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
 
-        // saves the json, pushes the raw text array along
-        jobs.push((parsedPDFs) => {
-            pdfs = parsedPDFs;
-            return parsedPDFs.map(pdf => pdf.text);    
+        // 3. Chunking
+        jobs.push(async ctx => {
+            const [chunks, fields] = await chunkResumes(ctx.texts);
+            ctx.chunks = chunks;
+            ctx.fields = fields;
         });
+        
+        // 4. Embedding
+        jobs.push(async ctx => ctx.embeddings = await Embedder.embed(ctx.texts));
+        
+        // now we have a json of arrays, where each key is a feature
+        // store it in resumes
 
-        // split the raw text into sections
-        jobs.push(splitResumes);
-
+        // add a vec field to each chunk that represents the chunk embedding
         super(tab, jobs);
     }
 };

@@ -59,5 +59,4 @@ export class MixedBreadEmbeddingModel extends TemplateEmbeddingModel {
             
         return response.data.data.map(item => item.embedding);
     }
-
 };

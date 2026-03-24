@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 // schema for chunk collection
-const ResumeChunkSchema = new mongoose.Schema({
+const ChunkSchema = new mongoose.Schema({
     raw: String,
     vec: [Number],
     date: mongoose.Schema.Types.Date,
@@ -21,4 +21,4 @@ const ResumeChunkSchema = new mongoose.Schema({
     }
 });
 
-export const Chunk = new mongoose.model('Chunk', ResumeChunkSchema);
+export const ChunkModel = new mongoose.model('Chunk', ChunkSchema);

@@ -95,10 +95,10 @@ export const parseBinaryPDFs = async (resumeBuffers) => {
     for (const buffer of resumeBuffers) {
         
         // run parsing functions
-        const text = await binaryToText(buffer);   
+        const text = await binaryToText(buffer);
         
-        // store data as json in array
-        parsed.push({ text });
+        // store in array
+        parsed.push(text);
     }
 
     return parsed;
@@ -123,29 +123,53 @@ const callGroq = async (prompt) => {
     });
     
     // bruh why ts buried :sob:
-    return response.choices[0].message.content;
+    const text = response.choices[0].message.content;
+    return JSON.parse(text);
 };
 
 const splitResumeWithLLM = async (resume) => {
 
     const prompt = `
         You are given the raw text of a resume. 
-        Identify major section headers (like Education, Skills, Projects, and Experience) and return a JSON mapping of header to its associated text
+        Identify major section headers (like Education, Skills, Projects, and Experience) and their associated text content.
+        Return a JSON mapping of header to its associated text.
+        Ensure the mapping keys are chosen from: [education, skills, projects, experience, leadership, clubs] and are lowercase with no whitespace.
         Resume text: \n${resume}
     `;
 
-    const text = await callGroq(prompt);
-    const json = JSON.parse(text);
-    return json;
+    return await callGroq(prompt);
 };
 
-export const splitResumes = async (resumes) => {
+const extractMetadataWithLLM = async (resume) => {
     
-    const split = [];
+    const prompt = `
+        You are given the raw text of a resume. 
+        Identify the graduation year, first named major, and their roles.
+        Respond in json format, using null if a field is not found.
+        roles should be an array of strings.
+        Use keys: class, major, and roles. 
+
+        Resume text: \n${resume}
+    `;
+
+    return await callGroq(prompt);
+};
+
+export const chunkResumes = async (resumes) => {
+    
+    const chunks = [];
+    const metadata = [];
     for (const text of resumes) {
-        const mapping = await splitResumeWithLLM(text);
-        split.push(mapping);
+        
+        // get the data
+        const chunk = await splitResumeWithLLM(text);
+        const data = await extractMetadataWithLLM(text);
+
+        // add it to the array
+        chunks.push(chunk);
+        metadata.push(data);
+
     }
 
-    return split;
-}
+    return [chunks, metadata];
+};
