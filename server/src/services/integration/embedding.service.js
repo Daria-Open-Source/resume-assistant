@@ -10,7 +10,8 @@ class TemplateEmbeddingModel {
     constructor(client) { this.client = client; }
     async initialize() {}
     async embed(documents) {
-        if (typeof documents != typeof Array) throw new Error('X_EmbeddingModel.embed expects input of type Array');
+        if (!Array.isArray(documents))
+            throw new Error('X_EmbeddingModel.embed expects input of type Array');
         return await this._embedImplementation();
     }
     async _embedImplementation(documents) {}

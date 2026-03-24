@@ -17,3 +17,5 @@ const ResumeChunkSchema = new mongoose.Schema({
         updatedAt: true
     }
 });
+
+export const Chunk = new mongoose.Model('Chunk', ResumeChunkSchema);
