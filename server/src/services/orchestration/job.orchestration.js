@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import { getResumesAsBinary } from "../integration/resume.service.js"
+import { getResumesAsBinary } from "../integration/resume.integration.js"
 import { parseBinaryPDFs, splitResumes } from '../utility/parser.utility.js';
 
 /*

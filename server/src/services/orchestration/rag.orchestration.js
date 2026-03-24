@@ -18,13 +18,16 @@ export const doQuery = async (userQuery) => {
     // filters = {}
     
     // run the query on the vector store
-    const kRelevantDocs = Store.vectorSearch(
+    const kDocsPerSection = await Store.vectorSearch(
         vectorizedQuery,
         5
     );
 
-    // 
+    // Call the LLM
+    LLM.preparePrompt(userQuery, kDocsPerSection);
 
+    // Run the prompt
+    const response = await LLM.executePrompt();
 
-
+    return response;
 };

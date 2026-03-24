@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { parseMultiform } from '../extraction/parser.service.js';
+import { parseMultiform } from '../extraction/parser.utility.js';
 
 export const getResumesAsBinary = async () => {
 
