@@ -5,6 +5,7 @@ const ChunkSchema = new mongoose.Schema({
     raw: String,
     vec: [Number],
     major: String,
+    year: Number,
     roles: [String],
     section: {
         type: String,

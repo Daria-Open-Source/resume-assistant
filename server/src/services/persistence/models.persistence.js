@@ -8,9 +8,14 @@ class TemplateModelService {
     async find(filters = null) { return await this.model.find(filters); }
     async findOneById(id) { return await this.model.findOneById(id); }
 
-    async insertOne(data) { 
-        const item = await this.model(data);
-        return this.model.save(item); 
+    async insert(data, useBulk) {
+        
+        // write many with one call
+        if (useBulk && Array.isArray(data))
+            return await this.model.insertMany(data);
+        
+        // write one
+        return await this.model.create(data);
     }
 
     async updateOneById(data, id) { return await this.model.findByIdAndUpdate(id, data); }

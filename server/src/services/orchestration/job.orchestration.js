@@ -71,13 +71,13 @@ export class ResumeJob extends Job {
         });
 
         // 2. Parsing (No return needed!)
-        jobs.push(async ctx => ctx['texts'] = await parseBinaryPDFs(ctx.buffers));
+        jobs.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
 
         // 3. Chunking
         jobs.push(async ctx => {
-            const [chunks, fields] = await chunkResumes(ctx.texts);
+            const [chunks, meta] = await chunkResumes(ctx.texts);
             ctx.chunks = chunks;
-            ctx.fields = fields;
+            ctx.metadata = meta;
         });
         
         // 4. Embedding
@@ -105,11 +105,46 @@ export class ResumeJob extends Job {
                 ctx.embeddings.push(embedMap);
             });
 
-            console.log(ctx.embeddings);
+            console.log(ctx);
         });
         
         // now we have a json of arrays, where each key is a feature
         // store it in resumes
+        jobs.push(async (ctx) => {
+
+            let dbDocsToWrite = [];
+            for (let i = 0; i < ctx.fnames.length; i++) {
+                
+                const vecDict = ctx.embeddings[i];
+                const rawDict = ctx.chunks[i];
+                const meta = ctx.metadata[i];
+                // const meta = ctx.metadata[i];
+                let baseDoc = {
+                    'major': meta.major,
+                    'year': meta.class,
+                    'roles': meta.roles
+                };
+
+                // iterate over these
+                const vecs = Object.values(vecDict);
+                const raws = Object.values(rawDict);
+                const secs = Object.keys(rawDict);
+                for (let j = 0; j < secs.length; j++) {
+                    
+                    const dbDoc = {
+                        ...baseDoc,
+                        'vec': vecs[j],
+                        'raw': raws[j],
+                        'section': secs[j]
+                    };
+                    dbDocsToWrite.push(dbDoc); 
+                }
+            }
+
+            // do a bulk write here
+            const res = await Store.addToStore(dbDocsToWrite, true);
+            console.log(res);
+        });
 
         // add a vec field to each chunk that represents the chunk embedding
         super(tab, jobs);
