@@ -9,7 +9,7 @@ export class VectorStore extends ChunkService {
     async vectorSearch(query, k, filters = null, ranker = null) {}
 
     // chunk embedding
-    async addToStore(data) {}
+    async addToStore(data) { await super.insertOne(data); }
 
     // disable these methods
     async find() { throw new Error('VectorStore class only supports VectorStore.vectorSearch and VectorStore.addToStore'); }

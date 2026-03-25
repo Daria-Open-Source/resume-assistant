@@ -16,9 +16,6 @@ import { VectorStore } from '../persistence/vectorStore.persistence.js';
     -> 
 */
 
-const Embedder = new MixedBreadEmbeddingModel();
-await Embedder.initialize();
-
 
 export class Job {
 
@@ -47,20 +44,18 @@ export class Job {
     
     async runJob() { 
 
-        let output = null;
+        let context = {};
 
-        // wait for each task to finish
-        // then feed output into the next
-
-        for (const t of this.tasks) {
-            // either initialize output or feed it
-            if (output == null) output = await t();
-            else                output = await t(output);
-        }
-        
-        return output;
+        // context is passed by reference to each task
+        for (const t of this.tasks) await t(context);
+        return context;
     }
 };
+
+const Embedder = new MixedBreadEmbeddingModel();
+await Embedder.initialize();
+
+const Store = new VectorStore();
 
 export class ResumeJob extends Job {
     constructor() {
@@ -76,7 +71,7 @@ export class ResumeJob extends Job {
         });
 
         // 2. Parsing (No return needed!)
-        jobs.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
+        jobs.push(async ctx => ctx['texts'] = await parseBinaryPDFs(ctx.buffers));
 
         // 3. Chunking
         jobs.push(async ctx => {
@@ -86,7 +81,32 @@ export class ResumeJob extends Job {
         });
         
         // 4. Embedding
-        jobs.push(async ctx => ctx.embeddings = await Embedder.embed(ctx.texts));
+        jobs.push(async ctx => {
+            
+            ctx.embeddings = [];
+
+            // get all chunk texts and embed with one api call
+            // use cursor to iterate over indices in embeds
+            let allChunkTexts = ctx.chunks.flatMap(chunk => Object.values(chunk));
+            const embeds = await Embedder.embed(allChunkTexts);
+            let cursor = 0;
+
+            // for each chunk, build an embedding map to add to ctx.embeddings
+            ctx.chunks.forEach(chunk => {
+                let embedMap = {};
+
+                // loop over sections in a chunk, mapping that text embedding to a section name
+                Object.keys(chunk).forEach(section => {
+                    embedMap[section] = embeds[cursor];
+                    cursor++;
+                });
+
+                // after iterating over a chunk, push it to the ctx.embeddings array
+                ctx.embeddings.push(embedMap);
+            });
+
+            console.log(ctx.embeddings);
+        });
         
         // now we have a json of arrays, where each key is a feature
         // store it in resumes
