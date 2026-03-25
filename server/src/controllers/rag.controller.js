@@ -1,11 +1,9 @@
 import { doQuery } from "../services/orchestration/rag.orchestration.js";
-
+import { parseBinaryPDFs, chunkResumes } from '../services/utility/parser.utility.js';
 /*
     Controller for the query. 
 */
 export const runQuery = async (req, res) => {
-
-    console.log('reached controller');
 
     // query is the prompt, title is the role they want
     const { username, query } = req.body;
@@ -18,9 +16,13 @@ export const runQuery = async (req, res) => {
 
     // we want to mark up or reference info on their pdf in the future
     const buffer = req.file.buffer;
-    const fileName = req.file.originalname;
+    console.log(buffer);
 
-    const data = await doQuery(query);
+    const text = await parseBinaryPDFs([buffer]);
+    const chunkedResume = await chunkResumes([text]);
+    const chunks = chunkedResume[0][0];
+
+    const data = await doQuery(query, chunks);
 
     return res.status(200).json(data);
 };

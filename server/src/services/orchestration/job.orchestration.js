@@ -60,28 +60,30 @@ const Store = new VectorStore();
 export class ResumeJob extends Job {
     constructor() {
 
-        let jobs = [];
+        // a job consists of executing a series of tasks
+        // this is modeled with an array of functions
+        let tasks = [];
         let tab = '0 * * * *';
 
         // 1. Fetching Data
-        jobs.push(async ctx => {
+        tasks.push(async ctx => {
             const data = await getResumesAsBinary();
             ctx.buffers = Object.values(data.files);
             ctx.fnames = Object.values(data.metadata);
         });
 
         // 2. Parsing (No return needed!)
-        jobs.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
+        tasks.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
 
         // 3. Chunking
-        jobs.push(async ctx => {
+        tasks.push(async ctx => {
             const [chunks, meta] = await chunkResumes(ctx.texts);
             ctx.chunks = chunks;
             ctx.metadata = meta;
         });
         
         // 4. Embedding
-        jobs.push(async ctx => {
+        tasks.push(async ctx => {
             
             ctx.embeddings = [];
 
@@ -110,7 +112,7 @@ export class ResumeJob extends Job {
         
         // now we have a json of arrays, where each key is a feature
         // store it in resumes
-        jobs.push(async (ctx) => {
+        tasks.push(async (ctx) => {
 
             let dbDocsToWrite = [];
             for (let i = 0; i < ctx.fnames.length; i++) {
@@ -147,6 +149,6 @@ export class ResumeJob extends Job {
         });
 
         // add a vec field to each chunk that represents the chunk embedding
-        super(tab, jobs);
+        super(tab, tasks);
     }
 };

@@ -16,7 +16,7 @@ const scheduleJobs = () => {
 };
 
 export const setupApp = async () => {
-    scheduleJobs();
+    // scheduleJobs();
     await connectToMongo();
     console.log('connected to mongodb');
 };

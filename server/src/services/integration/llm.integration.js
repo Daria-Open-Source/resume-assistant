@@ -76,7 +76,7 @@ gets candidates interviews.
 class TemplateLanguageModel {
 
     constructor (client) { this.client = client; }
-
+    
     preparePrompt(query, documents) {
         this.prompt = SYSTEM_PROMPT;
         this.query = query;
@@ -84,6 +84,7 @@ class TemplateLanguageModel {
     }
     async executePrompt() {}
 };
+
 
 export class GroqLanguageModel extends TemplateLanguageModel {
 

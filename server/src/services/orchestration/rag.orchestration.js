@@ -7,10 +7,10 @@ const Embedder = new MixedBreadEmbeddingModel();
 const LLM = new GroqLanguageModel();
 const Store = new VectorStore();
 
-export const doQuery = async (userQuery) => {
+// connect services
+await Embedder.initialize();
 
-    // connect services
-    await Embedder.initialize();
+export const doQuery = async (userQuery, resumeChunks) => {    
 
     // vectorize the user query
     const vectorizedQuery = await Embedder.embed([userQuery]);
@@ -21,13 +21,21 @@ export const doQuery = async (userQuery) => {
     // filters = {}
     
     // run the query on the vector store
-    const kDocsPerSection = await Store.vectorSearch(
-        vectorizedQuery,        // vector used in similarity search
-        5                       // controls the # of results to return in each section
-    );
+    console.log(resumeChunks);
+    const queries = Object.keys(resumeChunks).map( async section => {
+        console.log(section);
+        return await Store.vectorSearch(
+            vectorizedQuery[0],
+            5,
+            { section }
+        );
+    });
+
+    const results = await Promise.all(queries);
+    console.log(results);
 
     // Call the LLM
-    LLM.preparePrompt(userQuery, kDocsPerSection);
+    LLM.preparePrompt(userQuery, modelContext);
 
     // Run the prompt
     const response = await LLM.executePrompt();
