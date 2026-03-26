@@ -1,8 +1,9 @@
 import 'dotenv/config';
 import { getResumesAsBinary } from "../integration/resume.integration.js"
-import { chunkResumes, parseBinaryPDFs } from '../utility/parser.utility.js';
+import { ParsingRegistry } from '../parsing/registry.parsing.js';
 import { MixedBreadEmbeddingModel } from '../integration/embedding.integration.js';
 import { VectorStore } from '../persistence/vectorStore.persistence.js';
+import { text } from 'express';
 
 
 // const Embedder = new MixedBreadEmbeddingModel();
@@ -72,12 +73,25 @@ export class ResumeJob extends Job {
             ctx.fnames = Object.values(data.metadata);
         });
 
-        // 2. Parsing (No return needed!)
-        tasks.push(async ctx => ctx.texts = await parseBinaryPDFs(ctx.buffers));
+        // 2. Parse Binary into text
+        tasks.push(async ctx => {
+
+            // wait for promises resolve, then save to ctx
+            const textPromises = ctx.buffers.map(buff => ParsingRegistry.getText(buff));
+            const texts = await Promise.all(textPromises);
+            ctx.texts = texts;
+        });
 
         // 3. Chunking
         tasks.push(async ctx => {
-            const [chunks, meta] = await chunkResumes(ctx.texts);
+
+            // run text operations with an llm
+            const chunkPromises = ctx.texts.map(resume => ParsingRegistry.chunkResume(resume));
+            const metaPromises = ctx.texts.map(resume => ParsingRegistry.getMetadata(resume));
+
+            // wait for promises to resolve
+            const [chunks, meta] = await Promise.all([Promise.all(chunkPromises), Promise.all(metaPromises)]);
+
             ctx.chunks = chunks;
             ctx.metadata = meta;
         });
@@ -85,6 +99,12 @@ export class ResumeJob extends Job {
         // 4. Embedding
         tasks.push(async ctx => {
             
+            // Plan:
+            // -> embed all the chunk texts at once
+            // -> for each chunk, construct a mapping for chunk key to embedding vector
+            // -> read from embeds with global cursor, saving mapping to the embeddings array
+
+
             ctx.embeddings = [];
 
             // get all chunk texts and embed with one api call
@@ -106,8 +126,6 @@ export class ResumeJob extends Job {
                 // after iterating over a chunk, push it to the ctx.embeddings array
                 ctx.embeddings.push(embedMap);
             });
-
-            console.log(ctx);
         });
         
         // now we have a json of arrays, where each key is a feature
@@ -117,28 +135,37 @@ export class ResumeJob extends Job {
             let dbDocsToWrite = [];
             for (let i = 0; i < ctx.fnames.length; i++) {
                 
+                // i tracks individual resume samples
+                // this gets the associated info for a resume
                 const vecDict = ctx.embeddings[i];
                 const rawDict = ctx.chunks[i];
                 const meta = ctx.metadata[i];
-                // const meta = ctx.metadata[i];
+
+                // insert each chunk doc with that resume's specific metadata
                 let baseDoc = {
                     'major': meta.major,
                     'year': meta.class,
                     'roles': meta.roles
                 };
 
-                // iterate over these
+                // iterate over chunk data specific to a resume
                 const vecs = Object.values(vecDict);
                 const raws = Object.values(rawDict);
                 const secs = Object.keys(rawDict);
+                
+                // each resume (i) has chunks (j)                
                 for (let j = 0; j < secs.length; j++) {
                     
+                    // represents the complete doc
                     const dbDoc = {
                         ...baseDoc,
                         'vec': vecs[j],
                         'raw': raws[j],
                         'section': secs[j]
                     };
+
+                    // save to array > save to db FOR NOW
+                    // collect all into array then write once
                     dbDocsToWrite.push(dbDoc); 
                 }
             }

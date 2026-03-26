@@ -25,7 +25,7 @@ class TemplateEmbeddingModel {
 */
 export class HuggingFaceEmbeddingModel extends TemplateEmbeddingModel {
 
-    constructor() { super(null); }
+    constructor() { throw new Error('This model is deprecated. Use MixedBreadEmbeddingModel instead'); super(null); }
     async initialize() { this.client = await pipeline('feature-extraction', 'Xenova-allMiniLm-L6-v2', {
         auth_token: process.env.HF_TOKEN
     }); }

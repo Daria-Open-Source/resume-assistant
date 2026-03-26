@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { parseMultiform } from '../utility/parser.utility.js';
+import { ParsingRegistry } from '../parsing/registry.parsing.js';
 
 export const getResumesAsBinary = async () => {
 
@@ -13,5 +13,5 @@ export const getResumesAsBinary = async () => {
     const response = await axios.get(`${url}/${source}`, { responseType: 'stream' });
 
     // Pass the stream AND the headers (which contain the boundary)
-    if (response.status === 200) return await parseMultiform(response.data, response.headers);
+    if (response.status === 200) return await ParsingRegistry.parseResponse(response.data, response.headers);
 };

@@ -1,5 +1,5 @@
 import { doQuery } from "../services/orchestration/rag.orchestration.js";
-import { parseBinaryPDFs, chunkResumes } from '../services/utility/parser.utility.js';
+import { ParsingRegistry } from "../services/parsing/registry.parsing.js";
 /*
     Controller for the query. 
 */
@@ -11,18 +11,12 @@ export const runQuery = async (req, res) => {
     if (!req.file)
         return res.status(400).json({ 'error': 'no file upload' });
 
-    console.log(`got request from ${username}`);
-
 
     // we want to mark up or reference info on their pdf in the future
     const buffer = req.file.buffer;
-    console.log(buffer);
-
-    const text = await parseBinaryPDFs([buffer]);
-    const chunkedResume = await chunkResumes([text]);
-    const chunks = chunkedResume[0][0];
-
-    const data = await doQuery(query, chunks);
+    const resume = await ParsingRegistry.getText(buffer);
+    const chunkedResume = await ParsingRegistry.chunkResume(resume);
+    const data = await doQuery(query, chunkedResume);
 
     return res.status(200).json(data);
 };
