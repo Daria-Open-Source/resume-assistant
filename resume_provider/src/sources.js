@@ -53,7 +53,7 @@ export class GoogleDriveSource extends TemplateSource {
             includeItemsFromAllDrives: true,
         });
 
-        console.log(response.data.files);
+        // console.log(response.data.files);
 
         // for each file, download and save it to the array 
         const files = response.data.files.filter(f => f.name.endsWith('.pdf'));

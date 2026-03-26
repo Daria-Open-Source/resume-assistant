@@ -1,6 +1,13 @@
-const Groq = require('groq-sdk');
+import { MixedBreadEmbeddingModel } from "../integration/embedding.integration.js";
+import { GroqLLM } from '../integration/llm.integration.js'
+import { VectorStore } from "../persistence/vectorStore.persistence.js";
 
-//Define Schema to send to llm
+// Make objects
+const Embedder = new MixedBreadEmbeddingModel();
+const LLM = new GroqLLM();
+const Store = new VectorStore();
+
+// prompt for query analysis
 const SYSTEM_PROMPT = `
 You are a senior technical recruiter and career strategist with 15+ years of experience
 hiring for top companies. You have reviewed thousands of resumes and know exactly what
@@ -74,80 +81,34 @@ gets candidates interviews.
   }
 }
 `;
+// connect services
+await Embedder.initialize();
 
-//LLM Class holds api KEY, Query, Documents, prompt and fills them in
-class LLM {
-    constructor() {
-        this.client = new Groq({ apiKey: process.env.GROQ_API_KEY });
-        this.userQuery = null;
-        this.documents = null;
-        this.ready = false;
-        this.systemPrompt = null;
-    }
+export const doQuery = async (userQuery, resumeChunks) => {    
 
-    preparePrompt() {
-        try {
-            this.systemPrompt = SYSTEM_PROMPT;
-            this.ready = true;
-            return true;
-        } catch {
-            return false;
-        }
-    }
+    // vectorize the user query
+    const vectorizedQuery = await Embedder.embed([userQuery]);
 
-    injectUserQuery(userQuery) {
-        this.userQuery = userQuery;
-    }
+    // parse their resume to build more context??
+    // this step can infer a major, and likely targeted roles 
+    // no code for this, but would be accomplished with Groq
+    // filters = {}
+    
+    // run the query on the vector store
+    const queries = Object.keys(resumeChunks).map(async section => {
+        return await Store.vectorSearch(
+            vectorizedQuery[0],
+            5,
+            { section }
+        );
+    });
 
-    injectDocuments(documents) {
-        this.documents = documents;
-    }
+    // wait for all queries to resolve
+    const modelContext = await Promise.all(queries);
+    console.log(modelContext);
+    
+    // Run the prompt
+    const response = await LLM.executePrompt(SYSTEM_PROMPT, userQuery, modelContext);
 
-    //Executes prompt with schema
-    async executeQuery() {
-        if (!this.ready) {
-            throw new Error('LLM not prepared. Call preparePrompt() first.');
-        }
-        
-        const userMessage = `
-            ##Retrieved Resumes From Similar Role Holders
-            ${this.documents ? JSON.stringify(this.documents, null, 2) : 'No documents retrieved.'}
-
-            ##User Resume + Target Role
-            ${this.userQuery}
-        `;
-
-        //Run prompt into llm
-        try {
-            const response = await this.client.chat.completions.create({
-                model: 'llama-3.3-70b-versatile',
-                messages: [
-                    { role: 'system', content: this.systemPrompt },
-                    { role: 'user',   content: userMessage }
-                ],
-                temperature: 0.3,
-            });
-
-            const raw = response.choices[0].message.content;
-
-            //Strip markdown code if neccesary from response
-            const clean = raw
-                .trim()
-                .replace(/^```json/, '')
-                .replace(/^```/, '')
-                .replace(/```$/, '')
-                .trim();
-
-            const parsed = JSON.parse(clean);
-            return { ok: true, data: parsed };
-
-        } catch (err) {
-            if (err instanceof SyntaxError) {
-                return { ok: false, error: `JSON parse failed: ${err.message}` };
-            }
-            return { ok: false, error: err.message };
-        }
-    }
-}
-
-module.exports = { LLM };
+    return response;
+};
