@@ -1,0 +1,44 @@
+/* RPI Color Palette */
+:root {
+  --rpi-red: #D6001C;
+  --rpi-red-dark: #a8001596;
+  --rpi-red-hover: #b5001799;
+  --rpi-light-gray: #9EA2A2;
+  --rpi-dark-gray: #54585A;
+  --rpi-black: #000000;
+  --rpi-white: #FFFFFF;
+ 
+  /* Semantic */
+  --bg-page: #F4F4F2;
+  --bg-card: #FFFFFF;
+  --bg-input: #FFFFFF;
+  --border: #E0E0DE;
+  --border-focus: #D6001C;
+  --text-primary: #1A1A1A;
+  --text-secondary: #54585A;
+  --text-muted: #9EA2A2;
+  --step-inactive: #D4D4D0;
+  --step-done: #D6001C;
+ 
+  /* Layout */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --shadow-card: 0 2px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+  --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+ 
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+body {
+  font-family: 'DM Sans', sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+ 
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--step-inactive); border-radius: 3px; }
