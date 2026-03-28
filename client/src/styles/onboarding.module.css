@@ -1,0 +1,390 @@
+/* ─────────────────────────────────────────
+   Layout
+───────────────────────────────────────── */
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+}
+ 
+.main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 24px 80px;
+}
+ 
+.card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  width: 100%;
+  max-width: 560px;
+  padding: 48px;
+  animation: fadeUp 280ms cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+ 
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+ 
+/* ─────────────────────────────────────────
+   Nav bar
+───────────────────────────────────────── */
+.nav {
+  background: var(--rpi-white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 40px;
+  display: flex;
+  align-items: center;
+  gap: 48px;
+  height: 64px;
+}
+ 
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+ 
+.logoMark {
+  width: 32px;
+  height: 32px;
+  background: var(--rpi-red);
+  color: white;
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: 400;
+}
+ 
+.logoText {
+  font-size: 15px;
+  color: var(--text-primary);
+  letter-spacing: -0.3px;
+}
+ 
+.logoText strong {
+  color: var(--rpi-red);
+  font-weight: 600;
+}
+ 
+/* ─────────────────────────────────────────
+   Step indicators
+───────────────────────────────────────── */
+.steps {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  gap: 0;
+  flex: 1;
+  justify-content: center;
+}
+ 
+.stepItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+ 
+.stepItem.active { color: var(--rpi-red); }
+.stepItem.done   { color: var(--rpi-dark-gray); }
+ 
+.stepNumber {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--step-inactive);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+ 
+.active .stepNumber { background: var(--rpi-red); }
+.done .stepNumber   { background: var(--rpi-dark-gray); }
+ 
+.stepDivider {
+  width: 40px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 12px;
+  flex-shrink: 0;
+}
+ 
+/* ─────────────────────────────────────────
+   Progress bar
+───────────────────────────────────────── */
+.progressBar {
+  height: 3px;
+  background: var(--border);
+  position: relative;
+}
+ 
+.progressFill {
+  position: absolute;
+  top: 0; left: 0;
+  height: 100%;
+  background: var(--rpi-red);
+  transition: width 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+ 
+/* ─────────────────────────────────────────
+   Form field layouts
+───────────────────────────────────────── */
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+ 
+.fieldSingle {
+  margin-bottom: 20px;
+}
+ 
+.section {
+  margin-top: 28px;
+}
+ 
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  letter-spacing: 0.01em;
+}
+ 
+.roleError {
+  display: block;
+  font-size: 12px;
+  color: var(--rpi-red);
+  margin-bottom: 8px;
+}
+ 
+/* ─────────────────────────────────────────
+   Chip grids
+───────────────────────────────────────── */
+.chipGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+ 
+.chipRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+ 
+/* ─────────────────────────────────────────
+   Resume upload / drop zone
+───────────────────────────────────────── */
+.dropZone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-md);
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition);
+  background: var(--bg-page);
+}
+ 
+.dropZone:hover,
+.dragOver {
+  border-color: var(--rpi-red);
+  background: rgba(214, 0, 28, 0.03);
+}
+ 
+.hasFile {
+  border-style: solid;
+  border-color: var(--rpi-light-gray);
+  padding: 20px 24px;
+  background: var(--bg-card);
+}
+ 
+.dropContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+ 
+.uploadIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(214, 0, 28, 0.08);
+  color: var(--rpi-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+ 
+.dropMain {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+ 
+.dropSub  { font-size: 13px; color: var(--text-muted); }
+.dropLink { color: var(--rpi-red); font-weight: 500; }
+ 
+.filePreview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+}
+ 
+.fileIcon { font-size: 28px; flex-shrink: 0; }
+ 
+.fileName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  word-break: break-all;
+}
+ 
+.fileSize {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+ 
+.removeFile {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+  transition: color var(--transition);
+}
+ 
+.removeFile:hover { color: var(--rpi-red); }
+ 
+.uploadError {
+  font-size: 12px;
+  color: var(--rpi-red);
+  margin-top: 8px;
+}
+ 
+.skipRow { text-align: center; margin-top: 16px; }
+ 
+.skipBtn {
+  background: none;
+  border: none;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color var(--transition);
+}
+ 
+.skipBtn:hover { color: var(--text-secondary); }
+ 
+/* ─────────────────────────────────────────
+   Ready / confirmation page
+───────────────────────────────────────── */
+.readyPage    { text-align: center; }
+ 
+.readyBadge {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+ 
+.readyTitle {
+  font-family: 'DM Serif Display', serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+ 
+.readySubtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+ 
+.summaryCard {
+  background: var(--bg-page);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  text-align: left;
+  margin-bottom: 28px;
+}
+ 
+.summaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+ 
+.summaryRow:last-child { border-bottom: none; }
+ 
+.summaryLabel {
+  color: var(--text-muted);
+  font-weight: 500;
+  flex-shrink: 0;
+  min-width: 100px;
+}
+ 
+.summaryValue {
+  color: var(--text-primary);
+  text-align: right;
+  word-break: break-word;
+}
+ 
+.readyActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+ 
+.readyNote { font-size: 12px; color: var(--text-muted); }
+ 
+/* ─────────────────────────────────────────
+   Responsive
+───────────────────────────────────────── */
+@media (max-width: 640px) {
+  .nav        { padding: 0 20px; }
+  .stepLabel  { display: none; }
+  .card       { padding: 32px 24px; }
+}
+ 
+@media (max-width: 480px) {
+  .fieldRow     { grid-template-columns: 1fr; }
+  .chipGrid     { grid-template-columns: 1fr; }
+  .chipRow      { grid-template-columns: 1fr; }
+  .readyActions { flex-direction: column; gap: 12px; }
+}
