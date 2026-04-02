@@ -24,6 +24,7 @@ export class TextExtractor {
 
     // takes the resume text and identifies metadata
     async extractResumeMetadata(resumeAsText) {
+        throw new Error('This method is deprecated');
 
         const system = `
             You are given the raw text of a resume. 
@@ -46,23 +47,57 @@ export class TextExtractor {
     async chunkResumeText_v2(resumeAsText) {
 
         const system = `
-
-            You are given raw resume text and are tasked with breaking it into sections then chunks.
-            A section starts with a text header similar to any of these: Experience, Projects, Education, Skills, Leadership.
-            A chunk is an organized subsection within a section. All resume sections besides Skills have chunks.
-
-            EXAMPLE: if the Experience section has two jobs, each with bullet points and information, each job is a chunk.
-
-            RESPONSE TYPE: Return a JSON of sectionName to an array of sectionChunks.
-
-            sectionName is one of Experience, Projects, Education, Skills, or Leadership. If a resume section doesn't use this word, associate that section with the section name most similar.
-            sectionChunks is an array of chunks, which is the raw text associated with a subsection.
-
-            DO NOT provide additional information. Only provide the JSON output as specified.
-            DO NOT identify the heading text as a section. Intentionally exclude all personal information.
+            You are a specialized Resume Parser. Your goal is to segment text into logical subsections (chunks).
+            
+            RULES:
+            1. Identify sections: [Experience, Projects, Education, Skills, Leadership].
+            2. Within each section, identify 'chunks' (e.g., individual jobs, individual projects).
+            3. REDACT all PII: Names, emails, phones, and specific addresses must be replaced with '[REDACTED]'.
+            4. OUTPUT: Return valid JSON only. Format: {"SectionName": ["Chunk 1 text", "Chunk 2 text"]}.
         `;
 
         const user = resumeAsText;
+        const response = await this.llm.executePrompt(system, user);
+        return response;
+    }
+
+    async extractResumeMetadata_v2(sectionToChunks) {
+        const system = `
+            You are a Career Data Analyst. You will receive a JSON object representing a resume segmented into sections.
+            Your task: Generate a metadata summary and detailed per-chunk insights.
+
+            CRITICAL RULES:
+            1. OUTPUT VALID JSON ONLY. No prose, no markdown backticks.
+            2. MAPPING: The arrays in 'chunkMetadata' MUST correspond index-for-index with the input arrays.
+            3. REDACTION: Ensure no PII (emails, phones) enters the metadata.
+
+            EXAMPLE TRANSFORMATION:
+            Input: {"Experience": ["Software Intern at Google. Used Python for APIs."]}
+            Output: {
+                "globalMetadata": { ... },
+                "chunkMetadata": {
+                    "Experience": [{ "roles": ["Software Intern"], "skills": ["Python"], "competencies": ["API Development"] }]
+                }
+            }
+
+            EXPECTED SCHEMA:
+            {
+                "globalMetadata": {
+                    "major": "string or null",
+                    "graduationYear": "number or null",
+                    "totalYearsExperience": "number"
+                },
+                "chunkMetadata": {
+                    "Education": [{ "coursework": [] }],
+                    "Experience": [{ "roles": [], "skills": [], "competencies": [] }],
+                    "Projects": [{ "technologies": [], "achievements": [] }],
+                    "Leadership": [{ "positions": [], "associations": [], "accomplishments": [] }],
+                    "Skills": [{ "soft skills": [], "tools": [], "technical skills": [] }]
+                }
+            }
+        `;
+
+        const user = `Resume Chunked: ${JSON.stringify(sectionToChunks)}`;
         const response = await this.llm.executePrompt(system, user);
         return response;
     }
