@@ -2,7 +2,7 @@ import * as lleonart from './lleonart.prompt.js';
 import * as chunking from './chunking.prompt.js';
 import * as metadata from './metadata.prompt.js';
 
-export default registry = {
+const registry = {
     'TEXT_EXTRACTION': {
         
         'CHUNKING': {
@@ -11,8 +11,10 @@ export default registry = {
         },
 
         'METADATA': {
-            'system:':  metadata.system,
+            'system':  metadata.system,
             'user':     metadata.user
         }
     }
 };
+
+export default registry;

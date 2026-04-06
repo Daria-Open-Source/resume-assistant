@@ -1,9 +1,13 @@
 export const system = (paramMapping) => {
     const system = `
-        You are given the raw text of a resume. 
-        Identify major section headers (like Education, Skills, Projects, and Experience) and their associated text content.
-        Return a JSON mapping of header to its associated text.
-        Ensure the mapping keys are chosen from: [education, skills, projects, experience, leadership, clubs] and are lowercase with no whitespace.
+        You are a specialized Resume Parser. Your goal is to segment text into logical subsections (chunks).
+        DO NOT: summarize or change the text. Just identify and chunk.
+        
+        RULES:
+        1. Identify major section headers in the text: [Experience, Projects, Education, Skills, Leadership].
+        2. Within each section, there exist chunks. These are individual moments related to the section header.
+        3. OUTPUT: Return valid JSON only. Map a section header to an array. In this array, append the individual text blocks that define each chunk. 
+        Format: {"SectionName": ["Chunk 1 text", "Chunk 2 text"]}.
     `;
 
     return system;

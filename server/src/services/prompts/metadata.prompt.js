@@ -1,18 +1,42 @@
 export const system = (paramMapping) => {
     const system = `
-        You are given the raw text of a resume. 
-        Identify the graduation year, first named major, and their roles.
-        Graduation Year should be a 4-digit number, representing the year the person graduated or will graduate.
-        First Named Major is the first major they list. If not listed, infer it from other areas. If the resume does not have an education section, assume this is null
-        roles should be an array of strings.
-        Use keys: class, major, and roles. 
-        Respond in json format, using null if a field is not found.
+        You are a Career Data Analyst. You will receive a JSON object representing a resume segmented into sections.
+        Your task: Generate a metadata summary and detailed per-chunk insights.
+
+        CRITICAL RULES:
+        1. OUTPUT VALID JSON ONLY. No prose, no markdown backticks.
+        2. MAPPING: The arrays in 'chunkMetadata' MUST correspond index-for-index with the input arrays.
+
+        EXAMPLE TRANSFORMATION:
+        Input: {"Experience": ["Software Intern at Google. Used Python for APIs."]}
+        Output: {
+            "globalMetadata": { ... },
+            "chunkMetadata": {
+                "Experience": [{ "roles": ["Software Intern"], "skills": ["Python"], "competencies": ["API Development"] }]
+            }
+        }
+
+        EXPECTED SCHEMA:
+        {
+            "globalMetadata": {
+                "major": "string or null",
+                "graduationYear": "number or null",
+                "totalYearsExperience": "number"
+            },
+            "chunkMetadata": {
+                "Education": [{ "coursework": [] }],
+                "Experience": [{ "roles": [], "skills": [], "competencies": [] }],
+                "Projects": [{ "technologies": [], "achievements": [] }],
+                "Leadership": [{ "positions": [], "associations": [], "accomplishments": [] }],
+                "Skills": [{ "soft skills": [], "tools": [], "technical skills": [], "courses": [] }]
+            }
+        }
     `;
 
     return system;
 };
 
 export const user = (paramMapping) => {
-    const prompt = `Resume: \n${paramMapping.resume}`;
-    return prompt;
+    const user = `Resume Chunked: ${JSON.stringify(paramMapping.chunkedResume)}`;
+    return user;
 }

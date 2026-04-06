@@ -86,8 +86,8 @@ export class ResumeJob extends Job {
         tasks.push(async ctx => {
 
             // run text operations with an llm
-            const chunkPromises = ctx.texts.map(resume => ParsingRegistry.chunkResume(resume));
-            const metaPromises = ctx.texts.map(resume => ParsingRegistry.getMetadata(resume));
+            const chunkPromises = ctx.texts.map(resume => ParsingRegistry.chunkResume_nowait(resume));
+            const metaPromises = ctx.texts.map(resume => ParsingRegistry.getMetadata_nowait(resume));
 
             // wait for promises to resolve
             const [chunks, meta] = await Promise.all([Promise.all(chunkPromises), Promise.all(metaPromises)]);
