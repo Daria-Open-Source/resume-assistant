@@ -6,8 +6,10 @@ const Extractor = new TextExtractor();
 export const ParsingRegistry = {
 
     // arrow functions fix a scoping issue with the Extractor variable
-    "chunkResume": (resume) => Extractor.chunkResumeText(resume),
-    "getMetadata": (resume) => Extractor.extractResumeMetadata(resume),
+    "chunkResume": async (resume) => await Extractor.chunkResumeText(resume),
+    "getMetadata": async (resume) => await Extractor.extractResumeMetadata(resume),
+    "chunkResume_nowait": (resume) => Extractor.chunkResumeText(resume),
+    "getMetadata_nowait": (resume) => Extractor.extractResumeMetadata(resume),
     "parseResponse": parseResumeServerMultiform,
     "getText": binaryToText
 };
