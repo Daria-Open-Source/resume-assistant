@@ -50,8 +50,8 @@ export class TextExtractor {
             You are a specialized Resume Parser. Your goal is to segment text into logical subsections (chunks).
             
             RULES:
-            1. Identify sections: [Experience, Projects, Education, Skills, Leadership].
-            2. Within each section, identify 'chunks' (e.g., individual jobs, individual projects).
+            1. Identify section headers in the text: [Experience, Projects, Education, Skills, Leadership].
+            2. Within each section, identify 'chunks' (e.g., jobs, projects, experiences).
             3. REDACT all PII: Names, emails, phones, and specific addresses must be replaced with '[REDACTED]'.
             4. OUTPUT: Return valid JSON only. Format: {"SectionName": ["Chunk 1 text", "Chunk 2 text"]}.
         `;
