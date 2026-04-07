@@ -13,7 +13,7 @@ const scheduleJobs = () => {
     // Scheduler schedules the Jobs in the jobs array
     const jobs = [new ResumeJob()];
     const scheduler = new Scheduler(jobs);
-    scheduler.scheduleJobs();
+    scheduler.startJobs();
 };
 
 export const setupApp = async () => {

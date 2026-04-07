@@ -7,7 +7,7 @@ export class Scheduler {
         this.jobs = jobsList;
     }
     
-    scheduleJobs() {
+    startJobs() {
         console.log('scheduling jobs');
         // schedule every job in the job list
         
@@ -15,7 +15,7 @@ export class Scheduler {
         // this.jobs.map(job => cron.schedule(job.cronTab, async () => await job.runJob()));
     
         // run jobs immediately (when you don't care about testing scheduling)
-        this.jobs.forEach(async job => await job.runJob());
+        this.jobs.forEach(async job => await job.run());
     }
 
     _validateList(list) {
