@@ -1,9 +1,9 @@
-import { MixedBreadEmbeddingModel } from "../integration/embedding.integration.js";
+import { MixedBreadEmbeddingModel, BG3EmbeddingModel } from "../integration/embedding.integration.js";
 import { GroqLLM } from '../integration/llm.integration.js'
 import { VectorStore } from "../persistence/vectorStore.persistence.js";
 
 // Make objects
-const Embedder = new MixedBreadEmbeddingModel();
+const Embedder = new BG3EmbeddingModel();
 const LLM = new GroqLLM();
 const Store = new VectorStore();
 

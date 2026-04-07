@@ -1,5 +1,6 @@
 import { pipeline } from '@huggingface/transformers';
 import axios from 'axios';
+import OpenAI from 'openai';
 
 /* 
     TemplateEmbeddingModel exposes functions to be called by users
@@ -58,5 +59,32 @@ export class MixedBreadEmbeddingModel extends TemplateEmbeddingModel {
         });
             
         return response.data.data.map(item => item.embedding);
+    }
+};
+
+export class BG3EmbeddingModel extends TemplateEmbeddingModel {
+    constructor() { 
+        super(null); 
+        this.url = 'https://openrouter.ai/api/v1';
+    }
+    
+    //Initialize OpenAI instance as client
+    async initialize() { 
+        this.key = process.env.BG3_API_KEY;
+        this.client = new OpenAI({
+            baseURL: `${this.url}`,
+            apiKey: `${this.key}`,
+        });
+    }
+    
+    //Create response from baai model
+    async _embedImplementation(documents) {
+        const response = await this.client.embeddings.create({
+            model: "baai/bge-m3",
+            input: documents,
+            encoding_format: "float"
+        })
+        
+        return response.data.map(item => item.embedding);
     }
 };

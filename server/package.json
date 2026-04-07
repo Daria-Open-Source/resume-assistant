@@ -20,8 +20,10 @@
     "express": "^5.2.1",
     "groq-sdk": "^1.1.1",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.3.2",
+    "mongoose": "^9.3.3",
+    "multer": "^2.1.1",
     "node-cron": "^4.2.1",
+    "openai": "^6.33.0",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^2.4.5"
   }

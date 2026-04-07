@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { getResumesAsBinary } from "../integration/resume.integration.js"
 import { ParsingRegistry } from '../parsing/registry.parsing.js';
-import { MixedBreadEmbeddingModel } from '../integration/embedding.integration.js';
+import { BG3EmbeddingModel, MixedBreadEmbeddingModel } from '../integration/embedding.integration.js';
 import { VectorStore } from '../persistence/vectorStore.persistence.js';
 import { text } from 'express';
 
@@ -53,7 +53,7 @@ export class Job {
     }
 };
 
-const Embedder = new MixedBreadEmbeddingModel();
+const Embedder = new BG3EmbeddingModel();
 await Embedder.initialize();
 
 const Store = new VectorStore();
@@ -171,8 +171,10 @@ export class ResumeJob extends Job {
             }
 
             // do a bulk write here
+
+            //REMEMBER TO UNCOMMENT THIS FOR TESTING
             const res = await Store.addToStore(dbDocsToWrite, true);
-            console.log(res);
+            console.log(dbDocsToWrite);
         });
 
         // add a vec field to each chunk that represents the chunk embedding

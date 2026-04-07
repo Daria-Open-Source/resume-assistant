@@ -9,7 +9,6 @@ const connectToMongo = async () => await mongoose.connect(process.env.DARIA_DB_U
 
 // starts the job scheduler
 const scheduleJobs = () => {
-
     // Scheduler schedules the Jobs in the jobs array
     const jobs = [new ResumeJob()];
     const scheduler = new Scheduler(jobs);
