@@ -12,7 +12,7 @@ import { VectorStore } from '../persistence/vectorStore.persistence.js';
 /*
     The TemplateJob interface defines several functions for interaction
     -> constructor()    : pass a reference to a driver function associated with the job
-    -> runJob()         : executes the driver reference
+    -> run()         : executes the driver reference
     -> 
 */
 
@@ -50,6 +50,7 @@ export class ResumeJob extends Job {
 
     // defines the series of tasks involved in a ResumeJob
     // each function is a method of the class for testability
+    // bind is necessary due to inheritance reference being weird
     getTasks() {
         return [
             this._fetchResumes.bind(this),
@@ -80,13 +81,14 @@ export class ResumeJob extends Job {
 
         // run text operations with an llm
         const chunkPromises = ctx.texts.map(resume => ParsingRegistry.chunkResume_nowait(resume));
-        const metaPromises = ctx.texts.map(resume => ParsingRegistry.getMetadata_nowait(resume));
+        // const metaPromises = ctx.texts.map(resume => ParsingRegistry.getMetadata_nowait(resume));
+        const globalMetaPromises = ctx.texts.map(resume => ParsingRegistry.getGlobalMetadata_nowait(resume));
 
         // wait for promises to resolve
-        const [chunks, meta] = await Promise.all([Promise.all(chunkPromises), Promise.all(metaPromises)]);
+        const [chunks, global] = await Promise.all([Promise.all(chunkPromises), Promise.all(globalMetaPromises)]);
 
-        ctx.chunks = chunks;
-        ctx.metadata = meta;
+        ctx.chunks      = chunks;
+        ctx.globalMeta  = global;
     }
 
     async _embedText(ctx) {
@@ -101,6 +103,7 @@ export class ResumeJob extends Job {
         // get all chunk texts and embed with one api call
         // use cursor to iterate over indices in embeds
         let allChunkTexts = ctx.chunks.flatMap(chunk => Object.values(chunk));
+        throw new Error('allChunkTexts is a 2D array, while Embedder.embed() expects a 1D array');
         const embeds = await Embedder.embed(allChunkTexts);
         let cursor = 0;
 
@@ -127,13 +130,13 @@ export class ResumeJob extends Job {
             // this gets the associated info for a resume
             const vecDict = ctx.embeddings[i];
             const rawDict = ctx.chunks[i];
-            const meta = ctx.metadata[i];
+            const meta = ctx.globalMeta[i];
 
             // insert each chunk doc with that resume's specific metadata
             let baseDoc = {
                 'major': meta.major,
-                'year': meta.class,
-                'roles': meta.roles
+                'roles': meta.roles,
+                'year': meta.class
             };
 
             // iterate over chunk data specific to a resume
