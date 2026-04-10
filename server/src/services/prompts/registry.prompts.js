@@ -1,6 +1,6 @@
-import * as lleonart from './lleonart.prompt.js';
 import * as chunking from './chunking.prompt.js';
 import * as metadata from './metadata.prompt.js';
+import * as metaGlobal from './globalMetadata.prompt.js';
 
 const registry = {
     'TEXT_EXTRACTION': {
@@ -11,8 +11,13 @@ const registry = {
         },
 
         'METADATA': {
-            'system':  metadata.system,
+            'system':   metadata.system,
             'user':     metadata.user
+        },
+
+        'GLOBAL_METADATA': {
+            'system':   metaGlobal.system,
+            'user':     metaGlobal.user
         }
     }
 };
