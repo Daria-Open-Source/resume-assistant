@@ -2,14 +2,14 @@
 A resume analysis tool for RPI students. It takes a resume and query, and provides improvements based on objectives contextualized by resumes from a database. 
 
 ===
-# setup
+# Setup
 
-## prerequisites
+## Prerequisites
 - Node.js 18+
 - MongoDB Atlas cluster with a `vector-search` index on the `vec` field
 - Google service account JSON with Drive API access
 
-## environment variables
+## Environment Variables
 `server/.env`
 
 ```
@@ -26,7 +26,7 @@ GOOGLE_APPLICATION_CREDENTIALS=./service_key.json
 
 Google service account key at `resume_provider/service_key.json`.
 
-## run
+## Run
 ```
 cd server
 npm install
