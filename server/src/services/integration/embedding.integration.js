@@ -1,5 +1,6 @@
 import { pipeline } from '@huggingface/transformers';
 import axios from 'axios';
+import { Ollama } from 'ollama';
 
 /* 
     TemplateEmbeddingModel exposes functions to be called by users
@@ -12,7 +13,7 @@ class TemplateEmbeddingModel {
     async initialize() {}
     async embed(documents) {
         if (!Array.isArray(documents))
-            throw new Error('X_EmbeddingModel.embed expects input of type Array');
+            throw new Error('EmbeddingModel.embed expects input of type Array');
         return await this._embedImplementation(documents);
     }
     async _embedImplementation(documents) {}
@@ -59,4 +60,26 @@ export class MixedBreadEmbeddingModel extends TemplateEmbeddingModel {
             
         return response.data.data.map(item => item.embedding);
     }
+};
+
+
+// NOTE: Only Jacob's machine can run the Ollama Embedding Model
+export class OllamaEmbeddingModel extends TemplateEmbeddingModel {
+    constructor() { 
+        super(null); 
+        this.key = process.env.MIXEDBREAD_API_KEY;
+        this.url = 'https://api.mixedbread.com/v1/embeddings';
+    }
+    
+    async initialize() { this.client = new Ollama({ host: 'http://localhost:11434' }).embed; }
+    async _embedImplementation(documents) {
+
+        const vectors = await this.client({
+            model: 'nomic-embed-text',
+            input: documents
+        });
+        
+        return vectors;
+    }
+
 };
