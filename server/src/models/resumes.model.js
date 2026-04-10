@@ -41,6 +41,11 @@ const ResumeSchema = new mongoose.Schema({
         major: String,
         year: Number,
         roles: [String]
+    },
+
+    sourceId: {
+        source: String,
+        value: Number
     }
 }, 
 {
