@@ -41,9 +41,7 @@ export class Job {
 };
 
 export class ResumeJob extends Job {
-    constructor() {
-        super('0 * * * *');
-    }
+    constructor() { super('0 * * * *'); }
 
     // defines the series of tasks involved in a ResumeJob
     // each function is a method of the class for testability
@@ -61,9 +59,9 @@ export class ResumeJob extends Job {
     async _fetchResumes(ctx) {
         
         // fetches resumes from ResumeSource
-        const data = await getResumesAsBinary();
+        const data  = await getResumesAsBinary();
         ctx.buffers = Object.values(data.files);
-        ctx.fnames = Object.values(data.metadata);
+        ctx.fnames  = Object.values(data.metadata);
     }
 
     async _parseBinaries(ctx) {
@@ -72,22 +70,18 @@ export class ResumeJob extends Job {
         const textPromises = ctx.buffers.map(buff => ParsingRegistry.getText(buff));
         const texts = await Promise.all(textPromises);
         ctx.texts = texts;
-
-        console.log(ctx.texts);
     }
 
     async _chunkText(ctx) {
 
         // run text operations with an llm
-        const chunkPromises = ctx.texts.map(resume => ParsingRegistry.chunkResume_nowait(resume));
+        const chunkPromises      = ctx.texts.map(resume => ParsingRegistry.chunkResume_nowait(resume));
         const globalMetaPromises = ctx.texts.map(resume => ParsingRegistry.getGlobalMetadata_nowait(resume));
 
         // wait for promises to resolve
         const [chunks, global] = await Promise.all([Promise.all(chunkPromises), Promise.all(globalMetaPromises)]);
 
-        ctx.chunks = chunks;
-        console.log(ctx.chunks);
-
+        ctx.chunks     = chunks;
         ctx.globalMeta = global;
     }
 
@@ -109,7 +103,6 @@ export class ResumeJob extends Job {
         });
 
         await Promise.all(chunkPromises);
-        console.log(ctx.embeddings);
     }
 
     async _saveChunks(ctx) {
@@ -120,13 +113,19 @@ export class ResumeJob extends Job {
             // this gets the associated info for a resume
             const vecDict = ctx.embeddings[i];
             const rawDict = ctx.chunks[i];
-            const meta = ctx.globalMeta[i];
+            const meta    = ctx.globalMeta[i];
 
             // insert each chunk doc with that resume's global metadata
             let baseDoc = {
-                'major':    meta.major,
-                'roles':    meta.roles,
-                'year':     meta.class
+
+                // embeds the global meta associated with this resume
+                // into every chunk associated with the resume
+                // at the chunk level, we'll add a 'localMeta' dict with a similar purpose
+                'globalMeta': {    
+                    'major':    meta.major,
+                    'roles':    meta.roles,
+                    'year':     meta.class
+                }
             };
 
             // iterate over sections in a resume
