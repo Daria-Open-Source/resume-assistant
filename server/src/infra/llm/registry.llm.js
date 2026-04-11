@@ -6,5 +6,5 @@ const ol = new OllamaLLM();
 
 export const ModelRegistry = {
     'GROQ':   gq,
-    'Ollama': ol
+    'OLLAMA': ol
 };

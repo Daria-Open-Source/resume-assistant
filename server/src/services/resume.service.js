@@ -1,12 +1,14 @@
-class ResumeService {
+import { ParsingRegistry } from "../util/parsers/registry.parsers.js";
+
+export class ResumeService {
 
     // takes no dependencies at instantiation
     // instead uses dependency injection at runtime
     constructor() {}
 
-
+    // getNewResumes expects ResumeProvider to implement the Provider Interface
     async getNewResumes(ResumeProvider) {
-        
+
         // get the ids of resumes in the collection
         const resumes = await this.model.find();
         const oldIds = resumes.map(resume => resume.sourceId.value);
@@ -16,15 +18,31 @@ class ResumeService {
         return newResumes;
     }
 
+    // @requires:
+    // -> resumes to be JSON or an array of JSONS
+    // -> database to be a Mongoose Schema
     async saveToDatabase(resumes, database) {
-        if (Array.isArray(resumes))
-            await database.bulkWrite(resumes);
-        else
-            await database.insert(resumes);
+        
+        // optimized for multiple documents
+        if (Array.isArray(resumes)) await database.bulkWrite(resumes);
+        
+        // optimized for single insert
+        else await database.insert(resumes);
     }
 
-    async chunkResumes(ParsingService) {
-        const TextChunker = ParsingService.
+    // @requires:
+    // -> resumes to be String or an array of Strings
+    async chunkResumes(resumes) {
+
+        // converts to array so we can use .map
+        if (!Array.isArray(resumes)) resumes = [resumes];
+
+        
+        const TextChunker = ParsingRegistry.chunkResume;
+
+        let chunked = [];
+
+
     }
 
 };
