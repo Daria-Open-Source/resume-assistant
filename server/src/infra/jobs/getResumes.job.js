@@ -1,8 +1,8 @@
 import 'dotenv/config';
-import { getResumesAsBinary } from "../integration/resume.integration.js"
-import { ParsingRegistry } from '../parsing/registry.parsing.js';
-import { MixedBreadEmbeddingModel } from '../integration/embedding.integration.js';
-import { VectorStore } from '../persistence/vectorStore.persistence.js';
+import { getResumesAsBinary } from "../providers/resume.provider.js"
+import { ParsingRegistry } from '../../util/parsers/registry.parsers.js';
+import { MixedBreadEmbeddingModel } from '../embed/template.embed.js';
+import { VectorStore } from '../../services/vectorStore.persistence.js';
 
 
 // const Embedder = new MixedBreadEmbeddingModel();

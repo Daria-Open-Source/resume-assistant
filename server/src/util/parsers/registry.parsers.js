@@ -1,6 +1,6 @@
-import { TextExtractor } from "./extraction.parsing.js";
-import { parseResumeServerMultiform } from "./multiform.parsing.js";
-import { binaryToText } from "./binary.parsing.js"
+import { TextExtractor } from "./extraction.parsers.js";
+import { parseResumeServerMultiform } from "./multiform.parsers.js";
+import { binaryToText } from "./binary.parsers.js"
 
 const Extractor = new TextExtractor();
 export const ParsingRegistry = {

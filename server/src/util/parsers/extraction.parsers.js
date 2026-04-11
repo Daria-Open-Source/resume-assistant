@@ -1,5 +1,5 @@
 import { Ollama } from "ollama";
-import { GroqLLM } from "../integration/llm.integration.js";
+import { GroqLLM } from "../../infra/llm/template.llm.js";
 import PromptRegistry from "../prompts/registry.prompts.js";
 
 export class TextExtractor {

@@ -3,6 +3,7 @@ import * as metadata from './metadata.prompt.js';
 import * as metaGlobal from './globalMetadata.prompt.js';
 
 const registry = {
+    
     'TEXT_EXTRACTION': {
         
         'CHUNKING': {
@@ -18,6 +19,13 @@ const registry = {
         'GLOBAL_METADATA': {
             'system':   metaGlobal.system,
             'user':     metaGlobal.user
+        }
+    },
+
+    'RAG': {
+
+        'GENERATE': {
+            
         }
     }
 };

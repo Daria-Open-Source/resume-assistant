@@ -1,5 +1,5 @@
 import cron from 'node-cron';
-import { Job } from './job.orchestration.js'; 
+import { Job } from './getResumes.job.js'; 
 
 export class Scheduler {
     constructor(jobsList) {

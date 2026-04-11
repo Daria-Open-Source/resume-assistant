@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import axios from 'axios';
-import { ParsingRegistry } from '../parsing/registry.parsing.js';
+import { ParsingRegistry } from '../../util/parsers/registry.parsers.js';
 
 export const getResumesAsBinary = async () => {
     
