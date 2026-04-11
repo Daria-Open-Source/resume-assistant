@@ -11,9 +11,7 @@ const localMetaBaseSchema = new mongoose.Schema({
 const ChunkSchema = new mongoose.Schema({
     
     resumeId: mongoose.Schema.Types.ObjectId,
-    localMeta: {
-
-    },
+    localMeta: localMetaBaseSchema,
     raw: String,
     vec: [Number],
     section: {
