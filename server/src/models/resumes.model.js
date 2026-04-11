@@ -46,6 +46,11 @@ const ResumeSchema = new mongoose.Schema({
     sourceId: {
         source: String,
         value: Number
+    },
+
+    beenChunked: {
+        type: Boolean,
+        default: false
     }
 }, 
 {

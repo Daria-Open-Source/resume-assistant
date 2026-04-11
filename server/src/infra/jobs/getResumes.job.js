@@ -1,44 +1,8 @@
 import 'dotenv/config';
-import { getResumesAsBinary } from "../providers/resume.provider.js"
-import { ParsingRegistry } from '../../util/parsers/registry.parsers.js';
-import { MixedBreadEmbeddingModel } from '../embed/template.embed.js';
+import { ParsingRegistry } from '../../util/parsers/registry.parsers.js";
 import { VectorStore } from '../../services/vectorStore.persistence.js';
 
-
-// const Embedder = new MixedBreadEmbeddingModel();
-//const Store = new VectorStore();
-
-// await Embedder.initialize();
-/*
-    The TemplateJob interface defines several functions for interaction
-    -> constructor()    : pass a reference to a driver function associated with the job
-    -> run()         : executes the driver reference
-    -> 
-*/
-
-const Embedder = new MixedBreadEmbeddingModel();
-await Embedder.initialize();
-
 const Store = new VectorStore();
-
-export class Job {
-
-    // cronTab dictates how often the job runs
-    constructor(cronTab) { this.cronTab = cronTab; }
-    
-    async run() { 
-
-        let context = {};
-
-        // the context is passed by reference to each task
-        // it maintains a shared state between tasks
-        for (const t of this.getTasks()) await t(context);
-        return context;
-    }
-
-    // entrypoint for defining tasks in the task array
-    getTasks() { throw new Error('the child class is not implementing tasks, ensure it does. '); }
-};
 
 export class ResumeJob extends Job {
     constructor() { super('0 * * * *'); }
