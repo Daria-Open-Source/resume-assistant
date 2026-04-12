@@ -38,14 +38,14 @@ const ResumeSchema = new mongoose.Schema({
     // shared across all chunks
     // of this resume
     globalMeta: {
-        major: String,
-        year: Number,
+        major: { type: [String] },
+        year: { type: Number },
         roles: [String]
     },
 
     sourceId: {
-        source: String,
-        value: Number
+        source: { type: String },
+        value: { type: String }
     },
 
     addedToChunks: {

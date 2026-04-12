@@ -1,4 +1,6 @@
 import { PromptRegistry } from '../util/prompts/registry.prompts.js';
+import { ParserRegistry } from '../util/parsers/registry.parsers.js';
+
 export class ResumeService {
 
     // takes no dependencies at instantiation
@@ -12,54 +14,61 @@ export class ResumeService {
     }
 
     // @requires:
-    // -> ResumeProvider to provide resumes
+    // -> ResumeProvider must implement the TemplateProvider Interface
     // @returns:
-    // -> a string of new resumes not in the database
+    // -> a string of new resumes not in the database and their file metadata
     async getResumesFromRemote(ResumeProvider) {
 
         // get the ids of resumes in the db
         const resumes = await this.model.find();
-        const oldIds = resumes.map(resume => resume.sourceId.value);
-        console.log(oldIds);
+        const fingerprings = resumes.map(resume => Object.values(resume.sourceId).join('|'));
+
+        // pass the oldIds as a filter to the ResumeSource, get response as buffer
+        const { buffers, fileMetas } = await ResumeProvider.get({ 'filter': fingerprings });
         
-        // pass the oldIds as a filter to the ResumeSource
-        const { newBuffers, newMeta } = await ResumeProvider.get({ 'filter': oldIds });
-        return { newBuffers, newMeta };
+        // parse buffer
+        const bufferPromises = buffers.map(buffer => ParserRegistry.getText(buffer));
+        const resumeTexts = await Promise.all(bufferPromises);
+        
+        return { resumeTexts, fileMetas };
     }
 
     async getGlobalMetas(resumeTexts, LLM) {
 
         // LLM extracts global metas asynchronously
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.GLOBAL_METADATA;
-        let metadataPromises = resumeTexts.map(resume => LLM.executePrompt(system(), user(resume)));
+        let metadataPromises = resumeTexts.map(resume => LLM.executePrompt(system(), user({ 'resume': resume})));
         const globalMetas = await Promise.all(metadataPromises);
 
         return globalMetas;
     }
 
-    // @requires:
-    // -> database to be a Mongoose Schema
+    // @requires: None
     // @throws:
     // -> resumes/globalMetas/fileMetas are not equally-sized arrays
     async saveResumesToDatabase(chunkedResumes, globalMetas, fileMetas) {
         
+        // guards against non arrays
         if (!Array.isArray(chunkedResumes)
             || !Array.isArray(globalMetas)
             || !Array.isArray(fileMetas)
         ) throw new Error('saveResumesToDatabase expects inputs to be equal-sized arrays');
 
+        // guards against unequal array lengths
         if (chunkedResumes.length != globalMetas.length
             || chunkedResumes.length != fileMetas.length
         ) throw new Error('saveResumesToDatabase expects inputs to be equal-sized arrays');
 
+        // collect data from sources into one document
         const docs = chunkedResumes.map((resume, index) => ({
-            ...resume,
-            ...globalMetas[index],
-            sourceId: fileMetas[index].id
+            'chunkedResume': resume,
+            'globalMeta': globalMetas[index],
+            'sourceId': fileMetas[index]
         }));
 
         // optimized for multiple documents
-        await this.model.insertMany(docs);
+        const res = await this.model.insertMany(docs);
+        return res;
     }
 
     // @requires: None
@@ -71,7 +80,7 @@ export class ResumeService {
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.CHUNKING;
 
         // make the calls and wait for them to finish
-        const chunkPromises = resumes.map(resume => LLM.executePrompt(system(), user(resume)));
+        const chunkPromises = resumes.map(resume => LLM.executePrompt(system(), user({ 'resume': resume })));
         const chunks = await Promise.all(chunkPromises);
 
         return chunks;

@@ -18,20 +18,33 @@ export class ResumeProvider extends TemplateProvider {
         // Pass the stream AND the headers (which contain the boundary)
         if (response.status !== 200) throw new Error(response.data); 
         
-        const { files, metadata} = await ParserRegistry.parseResponse(response.data, response.headers);
+        const data = await ParserRegistry.parseResponse(response.data, response.headers);
+        const { files, metadata } = data;
 
         // filter oldIds from data
-        let newBuffers = [];
-        let newMeta = [];
-        const oldIds = args.filter;
+        let buffers = [];
+        let fileMetas = [];
+        const existingFingerprints = args.filter;
         for (let i = 0; i < metadata.length; i++) {
-            const id = metadata[i].id;
 
-            if (id in oldIds) continue;
-            newBuffers.push(files[i]);
-            newMeta.push(metadata[i]);
+            const fingerprint = `${source}|${metadata[i].id}`;
+
+            // filter existing ids
+            if (existingFingerprints.includes(fingerprint)) continue;
+            buffers.push(files[i]);
+            
+            // change schema to match mongoose
+            metadata[i]['source'] = source;
+            metadata[i]['value'] = metadata[i]['id']
+            
+            // delete unnecessary keys
+            delete metadata[i]['name']; 
+            delete metadata[i]['id'];
+            
+            // save to array
+            fileMetas.push(metadata[i]);
         }
 
-        return { newBuffers, newMeta };
+        return { buffers, fileMetas };
     }
 };
