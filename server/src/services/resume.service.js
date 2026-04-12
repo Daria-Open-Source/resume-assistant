@@ -6,15 +6,18 @@ export class ResumeService {
     // instead uses dependency injection at runtime
     constructor() {}
 
-    // getNewResumes expects ResumeProvider to implement the Provider Interface
-    async getNewResumes(ResumeProvider) {
+    // @requires:
+    // -> ResumeProvider to provide resumes
+    // @returns:
+    // -> a string of new resumes not in the database
+    async getResumesFromRemote(ResumeProvider, Database) {
 
         // get the ids of resumes in the collection
-        const resumes = await this.model.find();
+        const resumes = await Database.find();
         const oldIds = resumes.map(resume => resume.sourceId.value);
 
         // pass the oldIds as a filter to the ResumeSource
-        const newResumes = await ResumeProvider.getResumes(oldIds);
+        const newResumes = await ResumeProvider.get({ 'filter': oldIds });
         return newResumes;
     }
 

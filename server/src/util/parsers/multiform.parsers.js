@@ -8,22 +8,22 @@ async function multiform(stream, headers) {
     // get parser instance
     const parser = BusBoy({ headers });
 
-    const results = { files: {}, metadata: {} };
-    const filePromises = []; // Track file processing to avoid race conditions
+    let results = { files: [], metadata: [] };
+    let filePromises = []; // Track file processing to avoid race conditions
 
 
     // 1. Handling the PDF Binaries (the 'file' event)
     parser.on('file', (name, file, info) => {
-        const chunks = [];
-        
+        let chunks = [];
+
         const fileRecievedPromise = new Promise((resolve) => {
-            
+
             // Collect binary buffer pieces
             file.on('data', (chunk) => chunks.push(chunk));
             
             // Combine pieces into one Buffer and store in our variable
             file.on('end', () => { 
-                results.files[name] = Buffer.concat(chunks);
+                results.files.push(Buffer.concat(chunks));
                 resolve();
             });
         });
@@ -37,9 +37,8 @@ async function multiform(stream, headers) {
     parser.on('field', (name, val) => {
         
         // try-catch in case metadata isn't json parsable
-        try { results.metadata[name] = JSON.parse(val); } 
-        catch (e) { results.metadata[name] = val; }
-
+        try { results.metadata.push(JSON.parse(val)); } 
+        catch (e) { results.metadata.push(val); }
     });
 
     // parse the thing!

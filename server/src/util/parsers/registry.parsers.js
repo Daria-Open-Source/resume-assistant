@@ -12,7 +12,7 @@ const ol = new OllamaLLM();
 // const Extractor = new TextExtractor(ol);
 const Extractor = new TextExtractor(gq);
 
-export const ParsingRegistry = {
+export const ParserRegistry = {
 
     // arrow functions fix a scoping issue with the Extractor variable
     "chunkResume": async (resume) => await Extractor.chunkResumeText(resume),
