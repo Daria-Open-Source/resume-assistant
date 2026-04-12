@@ -23,7 +23,7 @@ class VectorStore {
     async _embedChunks(chunks) { return await this.embedder.embed(chunks); }
 
     async _saveToDatabase(chunks, embeds) {
-
+        
     }
 
     // entry point for pushing to the store
@@ -34,11 +34,21 @@ class VectorStore {
     }
 
     // entry point for querying the store
-    async search(textQuery, filters) {
+    async similaritySearch(textQuery, numCandidates, filters, RankingAlgorithm) {
 
+        // run vector search, delegating the implementation to the model
         const queryVector = await this.embedder.embed([textQuery]);
+        const results = await this.model.vectorSearch(
+            queryVector, 
+            numCandidates,
+            filters
+        );
 
+        // call the ranker if it exists
+        if (!RankingAlgorithm) return results;
         
+        const ranked = RankingAlgorithm.rank(results);
+        return ranked;
     }
 
 }

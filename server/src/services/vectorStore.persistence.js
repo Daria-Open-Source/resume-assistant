@@ -6,31 +6,7 @@ export class VectorStore extends ChunkService {
     constructor() { super(); }
 
     // similarity search w/ prefiltering
-    async vectorSearch(query, k, filters = null, ranker = null) {
-
-        const pipeline = [
-            {
-                $vectorSearch: {
-                    index: "vector-search",
-                    path: "vec",
-                    queryVector: query,
-                    numCandidates: k * 10,
-                    limit: k,
-                    filter: filters
-                }
-            },
-            {
-                $project: {
-                    raw: 1,
-                    vec: 1,
-                    score: { $meta: "vectorSearchScore" } // Captures the similarity score
-                }
-            }
-        ];
-
-        // If a ranker (like a Reranker) is provided, you might want to fetch 
-        // more candidates than k, then sort them in your application logic.
-        let results = await this.model.aggregate(pipeline);
+    
 
         if (ranker) {
             // Example: ranker.rerank(queryVector, results)

@@ -58,4 +58,31 @@ ChunkSchema.path('localMeta').discriminator('skills', new mongoose.Schema({
     skills: [String]
 }, { _id: false }));
 
+ChunkSchema.statics.hasVectorIndex = true;
+ChunkSchema.statics.vectorSearch = async (query, k, filters = null) => {
+
+    const pipeline = [
+        {
+            $vectorSearch: {
+                index: "vector-search",
+                path: "vec",
+                queryVector: query,
+                numCandidates: k * 10,
+                limit: k,
+                filter: filters
+            }
+        },
+        {
+            $project: {
+                raw: 1,
+                vec: 1,
+                score: { $meta: "vectorSearchScore" } // Captures the similarity score
+            }
+        }
+    ];
+
+    // If a ranker (like a Reranker) is provided, you might want to fetch 
+    // more candidates than k, then sort them in your application logic.
+    let results = await this.model.aggregate(pipeline);
+} 
 export const ChunkModel = new mongoose.model('Chunk', ChunkSchema);
