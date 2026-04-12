@@ -1,5 +1,4 @@
 import 'dotenv/config';
-import { ParserRegistry } from '../../util/parsers/registry.parsers.js';
 
 import { ResumeService } from '../../services/resume.service.js';
 import { ResumeModel } from '../../models/resumes.model.js';

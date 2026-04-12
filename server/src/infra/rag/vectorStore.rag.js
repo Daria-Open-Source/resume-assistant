@@ -5,7 +5,7 @@ What goes into a Vector Store?
 -> needs an
 */
 
-class VectorStore {
+export class VectorStore {
 
     // these are hard-coded dependencies
     // because changing them will involve deleting a lot of existing records
@@ -34,21 +34,17 @@ class VectorStore {
     }
 
     // entry point for querying the store
-    async similaritySearch(textQuery, numCandidates, filters, RankingAlgorithm) {
+    async similaritySearch(textQuery, numCandidates, filters) {
 
         // run vector search, delegating the implementation to the model
         const queryVector = await this.embedder.embed([textQuery]);
-        const results = await this.model.vectorSearch(
+        const similar = await this.model.vectorSearch(
             queryVector, 
             numCandidates,
             filters
         );
 
-        // call the ranker if it exists
-        if (!RankingAlgorithm) return results;
-        
-        const ranked = RankingAlgorithm.rank(results);
-        return ranked;
+        return similar;
     }
 
 }

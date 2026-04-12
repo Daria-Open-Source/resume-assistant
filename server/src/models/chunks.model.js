@@ -1,8 +1,6 @@
 import mongoose from 'mongoose';
 
-const localMetaBaseSchema = new mongoose.Schema({
-
-}, {
+const localMetaBaseSchema = new mongoose.Schema({}, {
     discriminatorKey: 'section',
     _id: false 
 });
@@ -12,6 +10,11 @@ const ChunkSchema = new mongoose.Schema({
     
     resumeId: mongoose.Schema.Types.ObjectId,
     localMeta: localMetaBaseSchema,
+    globalMeta: {
+        year: Number,
+        major: [String],
+        roles: [String]
+    },
     raw: String,
     vec: [Number],
     section: {
@@ -76,13 +79,12 @@ ChunkSchema.statics.vectorSearch = async (query, k, filters = null) => {
             $project: {
                 raw: 1,
                 vec: 1,
-                score: { $meta: "vectorSearchScore" } // Captures the similarity score
+                score: { $meta: "vectorSearchScore" }
             }
         }
     ];
 
-    // If a ranker (like a Reranker) is provided, you might want to fetch 
-    // more candidates than k, then sort them in your application logic.
     let results = await this.model.aggregate(pipeline);
+    return results;
 } 
 export const ChunkModel = new mongoose.model('Chunk', ChunkSchema);

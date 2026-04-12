@@ -1,7 +1,7 @@
 export const system = (paramMapping) => {
     const system = `
         You are a Career Data Analyst. You will receive a JSON object representing a resume segmented into sections.
-        Your task: Generate a metadata summary and detailed per-chunk insights.
+        Your task: Generate detailed per-chunk insights.
 
         CRITICAL RULES:
         1. OUTPUT VALID JSON ONLY. No prose, no markdown backticks.
@@ -10,7 +10,6 @@ export const system = (paramMapping) => {
         EXAMPLE TRANSFORMATION:
         Input: {"Experience": ["Software Intern at Google. Used Python for APIs."]}
         Output: {
-            "globalMetadata": { ... },
             "chunkMetadata": {
                 "Experience": [{ "roles": ["Software Intern"], "skills": ["Python"], "competencies": ["API Development"] }]
             }

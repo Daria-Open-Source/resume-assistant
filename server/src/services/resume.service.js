@@ -1,16 +1,18 @@
 import { PromptRegistry } from '../util/prompts/registry.prompts.js';
-import { ParserRegistry } from '../util/parsers/registry.parsers.js';
+import { ResumeModel } from '../models/resumes.model.js';
+import { EmbeddingRegistry } from '../infra/embed/registry.embed.js';
 
 export class ResumeService {
 
     // takes no dependencies at instantiation
     // instead uses dependency injection at runtime
-    constructor(
-        Database,
-        Embedder
-    ) {
-        this.model = Database;
-        this.embedder = Embedder;
+    constructor() {
+        this.model = ResumeModel;
+
+        // choose which embedding model you want to use
+        // this.embedder = EmbeddingRegistry.HUGGING_FACE;
+        this.embedder = EmbeddingRegistry.MIXED_BREAD;
+        // this.embedder = EmbeddingRegistry.OLLAMA;
     }
 
     // @requires:
@@ -75,6 +77,12 @@ export class ResumeService {
         // optimized for multiple documents
         const res = await this.model.insertMany(docs);
         return res;
+    }
+
+    async getUnchunked() {
+
+        // get the unchunked resumes
+        return await this.model.find({ hasBeenChunked: false });
     }
 
     // @requires: None

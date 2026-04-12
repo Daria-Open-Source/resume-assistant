@@ -1,5 +1,5 @@
 import * as chunking from './chunking.prompt.js';
-import * as metadata from './metadata.prompt.js';
+import * as metaLocal from './localMetadata.prompt.js';
 import * as metaGlobal from './globalMetadata.prompt.js';
 
 export const PromptRegistry = {
@@ -11,9 +11,9 @@ export const PromptRegistry = {
             'user':     chunking.user
         },
 
-        'METADATA': {
-            'system':   metadata.system,
-            'user':     metadata.user
+        'LOCAL_METADATA': {
+            'system':   metaLocal.system,
+            'user':     metaLocal.user
         },
 
         'GLOBAL_METADATA': {
