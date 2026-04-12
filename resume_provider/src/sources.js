@@ -70,6 +70,7 @@ export class GoogleDriveSource extends TemplateSource {
             binaries.push(Buffer.from(pdf.data));
             metadata.push({
                 name: f.name,
+                id:   f.id
             });
         }
 
