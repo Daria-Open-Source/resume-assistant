@@ -48,7 +48,7 @@ const ResumeSchema = new mongoose.Schema({
         value: Number
     },
 
-    beenChunked: {
+    addedToChunks: {
         type: Boolean,
         default: false
     }

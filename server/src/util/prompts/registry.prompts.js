@@ -2,7 +2,7 @@ import * as chunking from './chunking.prompt.js';
 import * as metadata from './metadata.prompt.js';
 import * as metaGlobal from './globalMetadata.prompt.js';
 
-const registry = {
+export const PromptRegistry = {
     
     'TEXT_EXTRACTION': {
         
@@ -29,5 +29,3 @@ const registry = {
         }
     }
 };
-
-export default registry;
