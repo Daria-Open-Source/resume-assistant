@@ -1,7 +1,9 @@
-import { ResumeProvider } from "./resume.provider.js";
+import { GoogleResumeProvider } from "./resume.provider.js";
 
-const rp = new ResumeProvider();
+const rp_go = new GoogleResumeProvider();
 
 export const ProviderRegistry = {
-    'RESUME': rp
+    'RESUME': {
+        'GOOGLE': rp_go
+    }
 };

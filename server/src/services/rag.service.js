@@ -1,11 +1,6 @@
-import { MixedBreadEmbeddingModel } from "../integration/embedding.integration.js";
-import { GroqLLM } from '../integration/llm.integration.js'
+import { ModelRegistry } from "../infra/llm/registry.llm.js";
+import { EmbeddingRegistry } from "../infra/embed/registry.embed.js";
 import { VectorStore } from "./vectorStore.persistence.js";
-
-// Make objects
-const Embedder = new MixedBreadEmbeddingModel();
-const LLM = new GroqLLM();
-const Store = new VectorStore();
 
 // connect services
 await Embedder.initialize();

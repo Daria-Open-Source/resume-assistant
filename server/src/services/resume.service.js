@@ -14,26 +14,32 @@ export class ResumeService {
     }
 
     // @requires:
-    // -> ResumeProvider must implement the TemplateProvider Interface
+    // -> ResumeProvider must implement the TemplateProvider interface
     // @returns:
     // -> a string of new resumes not in the database and their file metadata
     async getResumesFromRemote(ResumeProvider) {
 
         // get the ids of resumes in the db
-        const resumes = await this.model.find();
-        const fingerprings = resumes.map(resume => Object.values(resume.sourceId).join('|'));
+        const existingResumes = await this.model.find();
+        const fingerprints = existingResumes.map(resume => Object.values(resume.sourceId).join('|'));
 
         // pass the oldIds as a filter to the ResumeSource, get response as buffer
-        const { buffers, fileMetas } = await ResumeProvider.get({ 'filter': fingerprings });
-        
-        // parse buffer
-        const bufferPromises = buffers.map(buffer => ParserRegistry.getText(buffer));
-        const resumeTexts = await Promise.all(bufferPromises);
-        
-        return { resumeTexts, fileMetas };
+        // see that ResumeService returns this named JSON object
+        const { resumeTexts, sourceIds } = await ResumeProvider.get({ 'filter': fingerprints });
+        return { resumeTexts, sourceIds };
     }
 
+    // @requires:
+    // -> LLM must implement the TemplateLanguageModel interface
+    // @throws:
+    // -> resumeTexts is not an array
     async getGlobalMetas(resumeTexts, LLM) {
+
+        // guards against non arrays
+        if (!Array.isArray(chunkedResumes)
+            || !Array.isArray(globalMetas)
+            || !Array.isArray(fileMetas)
+        ) throw new Error('saveResumesToDatabase expects inputs to be equal-sized arrays');
 
         // LLM extracts global metas asynchronously
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.GLOBAL_METADATA;
