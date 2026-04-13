@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 import { ResumeService } from '../../services/resume.service.js';
 import { ResumeModel } from '../../models/resumes.model.js';
 import { ModelRegistry } from '../llm/registry.llm.js';

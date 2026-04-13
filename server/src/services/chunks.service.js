@@ -11,7 +11,8 @@ export class ChunkService {
     }
 
     async saveChunks(chunks) {
-        return await this.model.insertMany(chunks, { runValidators: true });
+        const docs = chunks.map(c => new this.model(c));
+        return await this.model.insertMany(docs, { runValidators: true });
     }
 
     async embedChunks(chunks) {
@@ -19,10 +20,7 @@ export class ChunkService {
         // collect all texts and embed in one call
         const raws = chunks.map(chunk => chunk.raw);
         const vecs = await this.embedder.embed(raws);
-
-        // iterate and save each embedding into its chunk
-        chunks.forEach((chunk, index) => chunk['vec'] = vecs[index]);
-        return chunks;
+        return vecs;
     }
 
     async getLocalMeta(chunks, LLM) {
@@ -30,17 +28,17 @@ export class ChunkService {
         // prompt the LLM and extract metadata for all chunks
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.LOCAL_METADATA;
         
+        /*
         // static implementation
         let localMetas = [];
         for (let i = 0; i < chunks.length; i++) {
             const section = chunks[i].section;
             const text = chunks[i].raw;
             const meta = await LLM.executePrompt(system({ section }), user({ text, section }));
-            console.log(meta);
             localMetas.push(meta);
         }
-        
-        /* pLimit implementation
+        */
+
         // pLimit prevents a RateLimitExceeded error
         // so far, 1 is the highest before being rate-limited
         const BATCH_SIZE = 1;
@@ -52,14 +50,11 @@ export class ChunkService {
                 () => LLM.executePrompt(system({ 'section': chunk.section }), user({ 'text': chunk.raw, 'section': chunk.section }))
             )
         );
-        const localMetas = await Promise.all(metaPromises);
-        */
-
-
-        // save the metadata as a field in chunk
-        chunks.forEach((chunk, index) => chunk['localMeta'] = localMetas[index]);
+        let localMetas = await Promise.all(metaPromises);
         
-        return chunks;
+        // SHOULD BE DONE IN MONGOOSE GET THIS OUT OF MY DOMAIN LAYER GRRRRRR
+        localMetas.forEach((meta, index) => meta['__t'] = chunks[index].section);
+        return localMetas;
     }
 
     async makeChunksFromResumes(resumes) {
