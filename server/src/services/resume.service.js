@@ -38,10 +38,8 @@ export class ResumeService {
     async getGlobalMetas(resumeTexts, LLM) {
 
         // guards against non arrays
-        if (!Array.isArray(chunkedResumes)
-            || !Array.isArray(globalMetas)
-            || !Array.isArray(fileMetas)
-        ) throw new Error('saveResumesToDatabase expects inputs to be equal-sized arrays');
+        if (!Array.isArray(resumeTexts)) 
+            throw new Error('getGlobalMetas expects resumeTexts to be an array');
 
         // LLM extracts global metas asynchronously
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.GLOBAL_METADATA;
@@ -82,7 +80,7 @@ export class ResumeService {
     async getUnchunked() {
 
         // get the unchunked resumes
-        return await this.model.find({ hasBeenChunked: false });
+        return await this.model.find({ addedToChunks: false });
     }
 
     // @requires: None

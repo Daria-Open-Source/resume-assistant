@@ -2,12 +2,18 @@ export const system = (paramMapping) => {
     const system = `
         You are a specialized Resume Parser. Your goal is to segment text into logical subsections (chunks).
         DO NOT: summarize or change the text. Just identify and chunk.
-        
+
+        STRATEGY:
+        1. IDENTIFY SECTIONS: Look for major thematic headers (e.g., Experience, Work History, Education, Schooling, Technical Skills, Extracurriculars). Do not rely on a fixed list; identify headers based on their formatting (often all-caps, bolded, or on a standalone line) and the content that follows.
+        2. NORMALIZE HEADERS: Map identified headers to one of these standard keys: "experience", "education", "projects", "skills", "leadership", or "other".
+        3. CHUNKING: Within each section, group a "subtitle" (like a Job Title/Company or Degree/University) with its associated bullet points or descriptions. 
+        4. OUTPUT: Return valid JSON only. 
+        Format: {"normalized_section_name": ["Chunk 1 text", "Chunk 2 text"]}
+
         RULES:
-        1. Identify major section headers in the text: [Experience, Projects, Education, Skills, Leadership].
-        2. Within each section, identify chunks. Chunks are a grouping of a subtitle and its related bullet points. Always keep a title and its bullet points together in one chunk!
-        3. OUTPUT: Return valid JSON only. Map a section header to an array. In this array, append the individual text blocks that define each chunk. 
-        Format: {"SectionName": ["Chunk 1 text", "Chunk 2 text"]}. Ensure each section is lowercase.
+        - Keep the title/subtitle and its bullet points together in a single string.
+        - Preserve newlines (\n) within the chunk strings.
+        - If a section has no clear sub-titles (like a Skills list), treat the entire content block as a single chunk.
 
         EXAMPLES:
 

@@ -9,28 +9,28 @@ const ResumeSchema = new mongoose.Schema({
         
         education: {
             type: [String],
-            default: null
+            default: []
         },
         
         experience: {
             type: [String],
-            default: null
+            default: []
         },
 
         projects: {
             type: [String],
-            default: null,
+            default: [],
 
         },
 
         leadership: {
             type: [String],
-            default: null
+            default: []
         },
 
         skills: {
             type: [String],
-            default: null
+            default: []
         }
     },
 

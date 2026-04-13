@@ -16,12 +16,12 @@ export class ChunkService {
 
     async embedChunks(chunks) {
         
-        // make all the embedding calls
-        const embedPromises = chunks.map(chunk => this.embedder.embed(chunk.raw));
-        const embeddings = await Promise.all(embedPromises);
-        
-        // save the embedding in the vec field
-        chunks.forEach((chunk, index) => chunk['vec'] = embeddings[index]);
+        // collect all texts and embed in one call
+        const raws = chunks.map(chunk => chunk.raw);
+        const vecs = await this.embedder.embed(raws);
+
+        // iterate and save each embedding into its chunk
+        chunks.forEach((chunk, index) => chunk['vec'] = vecs[index]);
         
         return chunks;
     }
@@ -58,7 +58,7 @@ export class ChunkService {
             const sections = Object.keys(resume.chunkedResume);
             
             sections.forEach(section => {
-                resume[section].forEach(raw => {
+                resume.chunkedResume[section].forEach(raw => {
                     
                     chunks.push({
                         raw,
