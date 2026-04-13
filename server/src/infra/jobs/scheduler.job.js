@@ -1,4 +1,4 @@
-import { TemplateJob } from "./template.job";
+import { TemplateJob } from "./template.job.js";
 
 export class Scheduler {
     constructor(jobsList) {
