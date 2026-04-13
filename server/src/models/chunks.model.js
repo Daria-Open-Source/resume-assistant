@@ -61,30 +61,4 @@ ChunkSchema.path('localMeta').discriminator('skills', new mongoose.Schema({
     skills: [String]
 }, { _id: false }));
 
-ChunkSchema.statics.hasVectorIndex = true;
-ChunkSchema.statics.vectorSearch = async (query, k, filters = null) => {
-
-    const pipeline = [
-        {
-            $vectorSearch: {
-                index: "vector-search",
-                path: "vec",
-                queryVector: query,
-                numCandidates: k * 10,
-                limit: k,
-                filter: filters
-            }
-        },
-        {
-            $project: {
-                raw: 1,
-                vec: 1,
-                score: { $meta: "vectorSearchScore" }
-            }
-        }
-    ];
-
-    let results = await this.model.aggregate(pipeline);
-    return results;
-} 
 export const ChunkModel = new mongoose.model('Chunk', ChunkSchema);

@@ -1,8 +1,5 @@
-import { doQuery } from "../services/orchestration/rag.orchestration.js";
 import { ParsingRegistry } from "../services/parsing/registry.parsing.js";
-/*
-    Controller for the query. 
-*/
+
 export const runQuery = async (req, res) => {
 
     // query is the prompt, title is the role they want

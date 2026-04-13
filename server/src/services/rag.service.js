@@ -1,18 +1,8 @@
-import { ChunkModel } from '../models/chunks.model.js';
-import { VectorStore } from '../infra/rag/vectorStore.rag.js';
 import { PromptRegistry } from '../util/prompts/registry.prompts.js';
-import { EmbeddingRegistry } from '../infra/embed/registry.embed.js';
 
 export class ResumeRagService {
 
-    constructor() {
-
-        // store interfaces other dependencies
-        this.store = new VectorStore(
-            new ChunkService(),
-            EmbeddingRegistry.MIXED_BREAD
-        );
-    }
+    constructor(VectorStore) { this.store = VectorStore; }
 
     async queryStore(textQuery, filters, LLM, RankingAlgorithm) {
         
@@ -21,8 +11,8 @@ export class ResumeRagService {
         const NUM_BEST    = 5;
 
         // get the most similar results
-        const similarResults = await VectorStore.similaritySearch(
-            textQuery,
+        const similarResults = await this.store.similaritySearch(
+            textQuery.role,
             NUM_SIMILAR,
             filters
         );
@@ -37,33 +27,11 @@ export class ResumeRagService {
         const { system, user } = PromptRegistry.RAG.GENERATE;
         const textResponse = await LLM.executePrompt(
             system(),
-            user({ 'input': textQuery, 'documents': bestResults })
+            user({ 'role': textQuery.role, 'resume': textQuery.resume, 'documents': bestResults })
         );
 
         return textResponse;
     }
 
-    async insertToStore(chunks, globalMetas, localMetas) {
-        
-        // embed chunk texts
-        const embedPromises = chunks.map(chunk => this.embedder.embed(chunk.raw));
-        const embeddings = await Promise.all(embedPromises);
-
-        // add each chunk's embedding to its document model
-        documents = [];
-        chunks.forEach((chunk, index) => {
-            
-            // save a document in the array
-            documents.push({
-                'raw': chunk.raw,
-                'vec': embeddings[index],
-                'section': chunk.section,
-                'resumeId': chunk.resumeId,
-                'localMeta': localMetas[index],
-                'globalMeta': globalMetas[index],
-            });
-        });
-
-        const res = await this.model.insertMany(documents);
-    }
+    async pushResumesToStore(resumes) { return await this.store.pushResumes(resumes); }
 }
