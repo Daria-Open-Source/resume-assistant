@@ -11,7 +11,7 @@ export class ChunkService {
     }
 
     async saveChunks(chunks) {
-        return await this.model.insertMany(chunks);
+        return await this.model.insertMany(chunks, { runValidators: true });
     }
 
     async embedChunks(chunks) {
@@ -22,7 +22,6 @@ export class ChunkService {
 
         // iterate and save each embedding into its chunk
         chunks.forEach((chunk, index) => chunk['vec'] = vecs[index]);
-        
         return chunks;
     }
 
@@ -31,17 +30,35 @@ export class ChunkService {
         // prompt the LLM and extract metadata for all chunks
         const { system, user } = PromptRegistry.TEXT_EXTRACTION.LOCAL_METADATA;
         
-        // pLimit prevents a TooManyRequests error
-        const BATCH_SIZE = 3;
+        // static implementation
+        let localMetas = [];
+        for (let i = 0; i < chunks.length; i++) {
+            const section = chunks[i].section;
+            const text = chunks[i].raw;
+            const meta = await LLM.executePrompt(system({ section }), user({ text, section }));
+            console.log(meta);
+            localMetas.push(meta);
+        }
+        
+        /* pLimit implementation
+        // pLimit prevents a RateLimitExceeded error
+        // so far, 1 is the highest before being rate-limited
+        const BATCH_SIZE = 1;
         const limit = pLimit(BATCH_SIZE);
 
-        // send controlled promise requests
-        const metaPromises = chunks.map(limit(chunk => LLM.executePrompt(system(), user(chunk.raw))));
+        // call the controlled promise and await the results
+        const metaPromises = chunks.map(chunk => 
+            limit(
+                () => LLM.executePrompt(system({ 'section': chunk.section }), user({ 'text': chunk.raw, 'section': chunk.section }))
+            )
+        );
         const localMetas = await Promise.all(metaPromises);
+        */
+
 
         // save the metadata as a field in chunk
         chunks.forEach((chunk, index) => chunk['localMeta'] = localMetas[index]);
-
+        
         return chunks;
     }
 

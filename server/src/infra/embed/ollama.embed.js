@@ -19,5 +19,4 @@ export class OllamaEmbeddingModel extends TemplateEmbeddingModel {
         
         return vectors;
     }
-
 };

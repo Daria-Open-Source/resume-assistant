@@ -32,6 +32,15 @@ export class ResumeService {
     }
 
     // @requires:
+    // -> resumeIds must be mongoose ObjectIds
+    async markResumesAsChunked(resumeIds) {
+        return await this.model.updateMany(
+            { _id: { $in: resumeIds } },
+            { $set: { addedToChunks: true } },
+        );
+    }
+
+    // @requires:
     // -> LLM must implement the TemplateLanguageModel interface
     // @throws:
     // -> resumeTexts is not an array
@@ -73,8 +82,7 @@ export class ResumeService {
         }));
 
         // optimized for multiple documents
-        const res = await this.model.insertMany(docs);
-        return res;
+        return await this.model.insertMany(docs, { runValidators: true });
     }
 
     async getUnchunked() {
@@ -97,5 +105,4 @@ export class ResumeService {
 
         return chunks;
     }
-
 };

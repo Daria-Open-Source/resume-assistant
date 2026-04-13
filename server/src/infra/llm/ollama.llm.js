@@ -7,16 +7,30 @@ export class OllamaLLM extends TemplateLanguageModel {
     }
 
     async executePrompt(system, user) {
-        const response = await this.llm.chat({
-            model: 'phi3:mini',
+        const response = await this.client.chat({
+            model: 'qwen2.5:0.5b',
             messages: [
                 { role: 'system',   content: `${system}` },
                 { role: 'user',     content: `${user}` }
             ],
             format: 'json',
-            options: { temperature: 0 }
+            stream: false,
+            request_options: {
+                timeout: 300000,
+            },
+            options: { 
+                temperature: 0,
+                num_thread: 6,
+                num_ctx: 2048
+             }
         });
 
-        return JSON.parse(response.message.content);
+        try {
+            const parsed = JSON.parse(response.message.content);
+            return parsed;
+        } catch(error) {
+            console.log(error);
+            return response.message.content;
+        }
     }
 };

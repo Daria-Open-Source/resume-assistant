@@ -5,7 +5,7 @@ import { ResumeRagService } from './rag.service.js';
 import { EmbeddingRegistry } from '../infra/embed/registry.embed.js';
 
 const resume = new ResumeService();
-const chunk  = new ChunkService(EmbeddingRegistry);
+const chunk  = new ChunkService(EmbeddingRegistry.MIXED_BREAD);
 const store  = new ResumeVectorStore(chunk);
 const rag    = new ResumeRagService(store);
 
