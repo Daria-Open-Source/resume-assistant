@@ -1,4 +1,5 @@
 import { Ollama } from 'ollama';
+import { TemplateEmbeddingModel } from './template.embed.js';
 
 // NOTE: Only Jacob's machine can run the Ollama Embedding Model
 export class OllamaEmbeddingModel extends TemplateEmbeddingModel {

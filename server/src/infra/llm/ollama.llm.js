@@ -1,5 +1,4 @@
 import { Ollama } from "ollama";
-
 import { TemplateLanguageModel } from "./template.llm.js";
 
 export class OllamaLLM extends TemplateLanguageModel {
