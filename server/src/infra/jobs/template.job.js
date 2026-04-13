@@ -1,4 +1,4 @@
-export class Job {
+export class TemplateJob {
 
     // cronTab dictates how often the job runs
     constructor(cronTab) { this.cronTab = cronTab; }

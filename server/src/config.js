@@ -1,4 +1,4 @@
-import { Scheduler } from "./services/orchestration/scheduler.orchestration.js"
+import { Scheduler } from './infra/jobs/scheduler.job.js'
 import { JobRegistry } from "./infra/jobs/registry.job.js";
 import { connectToMongo } from './util/config.util.js';
 
@@ -25,6 +25,6 @@ export const setupApp = async () => {
     console.log('connected to mongodb');
     
     // starts background jobs
-    scheduleJobs();
-    console.log('jobs scheduled');
+    // scheduleJobs();
+    // console.log('jobs scheduled');
 };

@@ -1,7 +1,10 @@
 import { UpdateResumeCollection } from './getResumes.job.js';
+import { UpdateChunksCollection } from './insertChunks.job.js';
 
-const updateJob = new UpdateResumeCollection();
+const updateResumes = new UpdateResumeCollection();
+const updateChunks = new UpdateChunksCollection();
 
 export const JobRegistry = {
-    'updateResumeCollection': updateJob
+    'updateResumes': updateResumes,
+    'updateChunks':  updateChunks
 };

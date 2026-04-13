@@ -1,12 +1,11 @@
-import 'dotenv/config';
-
 import { ServiceRegistry } from '../../services/registry.service.js';
 import { ModelRegistry } from '../llm/registry.llm.js';
+import { TemplateJob } from './template.job.js';
 
 const Resumes = ServiceRegistry.RESUME;
 const Chunks = ServiceRegistry.CHUNK;
 
-export class UpdateChunksCollection extends Job {
+export class UpdateChunksCollection extends TemplateJob {
     
     // cron tab to super determines interval the job runs at
     constructor() { super('0 * * * *'); }
@@ -17,7 +16,7 @@ export class UpdateChunksCollection extends Job {
     
     getTasks() {
         return [
-            this._getChunkedResumes.bind(this),
+            this._getResumes.bind(this),
             this._makeChunksFromResumes.bind(this),
             this._getLocalMetas.bind(this),
             this._embedChunks.bind(this),
@@ -26,7 +25,7 @@ export class UpdateChunksCollection extends Job {
         ];
     }
 
-    async _getUnchunkedResumes(ctx) {
+    async _getResumes(ctx) {
         
         // get resumes that arent in chunks
         ctx.resumes = await Resumes.getUnchunked();

@@ -1,14 +1,11 @@
-import { ResumeService } from '../../services/resume.service.js';
-import { ResumeModel } from '../../models/resumes.model.js';
+import { ServiceRegistry } from '../../services/registry.service.js';
 import { ModelRegistry } from '../llm/registry.llm.js';
 import { ProviderRegistry } from '../providers/registry.provider.js';
+import { TemplateJob } from './template.job.js';
 
-const Service = new ResumeService(
-    ResumeModel,
-    null
-);
+const Resumes = ServiceRegistry.RESUME;
 
-export class UpdateResumeCollection extends Job {
+export class UpdateResumeCollection extends TemplateJob {
     
     // cron tab to super determines interval the job runs at
     constructor() { super('0 * * * *'); }
@@ -29,7 +26,7 @@ export class UpdateResumeCollection extends Job {
     async _fetchResumes(ctx) {
         
         // get the resume texts from the remote
-        const { resumeTexts, fileMetas } = await Service.getResumesFromRemote(ProviderRegistry.RESUME);
+        const { resumeTexts, fileMetas } = await Resumes.getResumesFromRemote(ProviderRegistry.RESUME);
         ctx.resumes = resumeTexts;
         ctx.fileMetas = fileMetas;
     }
@@ -37,21 +34,21 @@ export class UpdateResumeCollection extends Job {
     async _chunkText(ctx) {
 
         // chunk the resumes with LLM
-        const chunks = await Service.chunkResumes(ctx.resumes, ModelRegistry.GROQ);
+        const chunks = await Resumes.chunkResumes(ctx.resumes, ModelRegistry.GROQ);
         ctx.chunks = chunks;
     }
 
     async _getGlobalMetas(ctx) {
 
         // get globals with LLM
-        const metas = await Service.getGlobalMetas(ctx.resumes, ModelRegistry.GROQ);
+        const metas = await Resumes.getGlobalMetas(ctx.resumes, ModelRegistry.GROQ);
         ctx.globalMetas = metas;
     }
 
     async _saveResumes(ctx) {
         
         // save everything to Mongo
-        await Service.saveResumesToDatabase(
+        await Resumes.saveResumesToDatabase(
             ctx.chunks,
             ctx.globalMetas,
             ctx.fileMetas
