@@ -85,7 +85,7 @@ export class ChunkService {
         return chunks;
     }
 
-    async vectorSearch(query, k, filters = null) {
+    async vectorSearch(query, k, filters) {
 
         const pipeline = [
             {
@@ -107,7 +107,6 @@ export class ChunkService {
             }
         ];
 
-        let results = await this.model.aggregate(pipeline);
-        return results;
+        return await this.model.aggregate(pipeline);
     } 
 };
