@@ -23,7 +23,7 @@
     "mongoose": "^9.3.2",
     "node-cron": "^4.2.1",
     "ollama": "^0.6.3",
-    "pdf-lib": "^1.17.1",
+    "p-limit": "^7.3.0",
     "pdf-parse": "^2.4.5"
   }
 }

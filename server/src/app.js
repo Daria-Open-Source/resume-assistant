@@ -5,7 +5,6 @@ import cors from 'cors';
 import ragRouter from './routers/rag.router.js'
 import utilRouter from './routers/util.router.js';
 
-
 const app = express();
 
 // middlewares

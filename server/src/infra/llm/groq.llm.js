@@ -1,19 +1,6 @@
 import Groq from 'groq-sdk';
 
-/*
-    Defines an interface for interacting with LLM implementations.
-    Ensures a common workflow: construct to set client, provide a query, then execute
-    Child classes have to work around this; they override these functions
-*/
-
-class TemplateLanguageModel {
-
-    constructor (client) { this.client = client; }
-
-    // interacts with a client to 
-    async executePrompt() { throw new Error('This method is not implemented. Check the child of TemplateLLM and ensure this method is overridden.'); }
-};
-
+import { TemplateLanguageModel } from './template.llm.js';
 
 export class GroqLLM extends TemplateLanguageModel {
 
@@ -28,7 +15,7 @@ export class GroqLLM extends TemplateLanguageModel {
 
         // execute response to groq server
         const response = await this.client.chat.completions.create({
-            model: 'llama-3.3-70b-versatile',
+            model: 'llama-3.1-8b-instant',
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user',   content: userPrompt }

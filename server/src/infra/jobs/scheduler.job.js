@@ -1,5 +1,4 @@
-import cron from 'node-cron';
-import { Job } from './job.orchestration.js'; 
+import { TemplateJob } from "./template.job.js";
 
 export class Scheduler {
     constructor(jobsList) {
@@ -25,7 +24,7 @@ export class Scheduler {
             throw new Error('The jobs argument must be type Array');
         
         // function over value for execution over update
-        if (!list.every(job => job instanceof Job))
+        if (!list.every(job => job instanceof TemplateJob))
             throw new Error('Every job must be a Job class item');
     }
 };

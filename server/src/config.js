@@ -1,24 +1,30 @@
-import mongoose from 'mongoose';
+import { Scheduler } from './infra/jobs/scheduler.job.js'
+import { JobRegistry } from "./infra/jobs/registry.job.js";
+import { connectToMongo } from './util/config.util.js';
 
-import { Scheduler} from "./services/orchestration/scheduler.orchestration.js"
-import { ResumeJob } from "./services/orchestration/job.orchestration.js";
-
-// connects the mongoose schemas to the mongo database
-const dbName = 'prod'; // process.env.USE_PROD ? 'prod' : 'dev'; 
-const connectToMongo = async () => await mongoose.connect(process.env.DARIA_DB_USER, { dbName });
+const connectToDatabase = async () => {
+    const dbName = process.env.USE_PROD ? 'prod' : 'dev';
+    await connectToMongo(dbName);
+};
 
 // starts the job scheduler
 const scheduleJobs = () => {
 
     // Scheduler schedules the Jobs in the jobs array
-    const jobs = [new ResumeJob()];
+    const jobs = [
+        JobRegistry.updateResumeCollection
+    ];
     const scheduler = new Scheduler(jobs);
     scheduler.startJobs();
 };
 
 export const setupApp = async () => {
-    await connectToMongo();
+    
+    // ensures datbase is good
+    await connectToDatabase();
     console.log('connected to mongodb');
+    
+    // starts background jobs
     // scheduleJobs();
     // console.log('jobs scheduled');
 };
