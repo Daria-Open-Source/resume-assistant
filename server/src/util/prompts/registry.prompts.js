@@ -1,7 +1,7 @@
 import * as chunking from './chunking.prompt.js';
 import * as metaLocal from './localMetadata.prompt.js';
 import * as metaGlobal from './globalMetadata.prompt.js';
-import * as query from './query.prompt.js';
+import * as generate from './generate.prompt.js';
 
 export const PromptRegistry = {
     
@@ -26,8 +26,8 @@ export const PromptRegistry = {
     'RAG': {
 
         'GENERATE': {
-            'system':   query.system,
-            'user':     query.user   
+            'system':   generate.system,
+            'user':     generate.user   
         }
     }
 };

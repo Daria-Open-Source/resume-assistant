@@ -2,7 +2,10 @@ import { ModelRegistry } from '../infra/llm/registry.llm.js';
 
 export class ResumeVectorStore {
 
-    constructor(DataService) { this.service = DataService; }
+    constructor(DataService) { 
+        
+        if (!DataService.hasVectorIndex) throw new Error('ResumeVectorStore requires a Data Service dependency that supports Vector Search');
+        this.service = DataService; }
 
     // entry point for pushing to the store
     async pushResumes(resumes) {
@@ -20,7 +23,7 @@ export class ResumeVectorStore {
         // run vector search, delegating the implementation to the model
         const queryVector = await this.service.embedder.embed([textQuery]);
         const similar = await this.service.vectorSearch(
-            queryVector, 
+            queryVector[0], 
             numCandidates,
             filters
         );

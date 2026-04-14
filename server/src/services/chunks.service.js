@@ -62,7 +62,6 @@ export class ChunkService {
         let chunks = [];
 
         // iterate over each resume
-        // iterate over each resume
         resumes.forEach(resume => {
             
             const globalMeta = resume.globalMeta;
@@ -96,7 +95,7 @@ export class ChunkService {
                     queryVector: query,
                     numCandidates: k * 10,
                     limit: k,
-                    filter: filters
+                    ...(filters && { filter: filters }) // only adds filters if it is not null
                 }
             },
             {

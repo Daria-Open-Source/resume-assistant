@@ -8,6 +8,13 @@ export const system = (paramMapping) => {
         3. Provide actionable advice on how to reframe existing experience to better align with the desired role's expectations.
 
         Maintain a professional, encouraging, and data-driven tone.
+        
+        JSON RESPONSE SCHEMA:
+        {
+            skillAlignment: String,
+            experienceGaps: String,
+            actionableAdvice: [String]
+        }
     `.trim();
 
     return system;
@@ -23,7 +30,7 @@ export const user = (paramMapping) => {
         GOLD STANDARD REFERENCE DATA (Verified High-Scoring Examples):
         ${paramMapping.documents}
 
-        Based on the reference data provided, perform a comparative analysis. What specific technical or soft skills are present in the successful examples that are missing or under-emphasized in the candidate's resume? Suggest three targeted improvements.
+        INPUT FROM USER: ${paramMapping.query}
             `.trim();
     return user;
 };
