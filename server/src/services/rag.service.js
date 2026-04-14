@@ -4,18 +4,20 @@ export class ResumeRagService {
 
     constructor(VectorStore) { this.store = VectorStore; }
 
-    async queryStore(input, filters, LLM, RankingAlgorithm) {
+    async queryStore(input, LLM, RankingAlgorithm) {
         
         // hard-coded limits for results
-        const NUM_SIMILAR = 25;
-        const NUM_BEST    = 5;
+        const NUM_SIMILAR = 2;
+        // const NUM_BEST    = 5;
 
         // get the most similar results
-        const similarResults = await this.store.similaritySearch(
-            input.role,
-            NUM_SIMILAR,
-            filters
-        );
+        let documents = {};
+        const sections = Object.keys(input.chunkedResume);
+        const docPromises = sections.map(section => this.store.similaritySearch(input.role, NUM_SIMILAR, { section }));
+        const docArray = await Promise.all(docPromises);
+        
+        // save array data to documents
+        sections.forEach((section, index) => documents[section] = docArray[index])
 
         /*
         // rank and take the top something
@@ -29,7 +31,7 @@ export class ResumeRagService {
         const { system, user } = PromptRegistry.RAG.GENERATE;
         const textResponse = await LLM.executePrompt(
             system(),
-            user({ 'role': input.role, 'query': input.query, 'resume': input.chunkedResume, 'documents': similarResults })
+            user({ 'role': input.role, 'query': input.query, 'resume': input.chunkedResume, documents })
         );
 
         return textResponse;

@@ -3,7 +3,7 @@ import { JobRegistry } from "./infra/jobs/registry.job.js";
 import { connectToMongo } from './util/config.util.js';
 
 const connectToDatabase = async () => {
-    const dbName = process.env.USE_PROD ? 'prod' : 'dev';
+    const dbName = 'dev'; // process.env.USE_PROD ? 'prod' : 'dev';
     await connectToMongo(dbName);
 };
 
