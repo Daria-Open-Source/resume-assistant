@@ -4,6 +4,7 @@ export interface ChunkedResume {
   projects:   string[];
   leadership: string[];
   skills:     string[];
+  [key: string]: string[];
 }
 
 export interface AnalysisResult {
