@@ -4,6 +4,16 @@ import { analyzeResume } from '../api/resume';
 import { AnalysisResult, AnalysisRouteState, SECTIONS } from '../types';
 import styles from './AnalysisPage.module.css';
 
+// Known section labels — used as display names when the key is recognised
+const SECTION_LABELS: Record<string, string> = Object.fromEntries(
+  SECTIONS.map(s => [s.key, s.label])
+);
+
+function labelFor(key: string) {
+  return SECTION_LABELS[key] ??
+    key.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+}
+
 /** Renders a string that may contain "- item" lines as a proper bullet list. */
 function BulletText({ text }: { text: string }) {
   const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
@@ -11,7 +21,6 @@ function BulletText({ text }: { text: string }) {
 
   if (!hasBullets) return <p className={styles.cardBody}>{text}</p>;
 
-  // Split into intro text (before first bullet) and bullet lines
   const firstBullet = lines.findIndex(l => l.startsWith('- '));
   const intro = lines.slice(0, firstBullet).join(' ');
   const bullets = lines.slice(firstBullet).map(l => l.replace(/^-\s*/, ''));
@@ -38,7 +47,18 @@ export default function AnalysisPage() {
   const [sectionIndex, setSectionIndex] = useState(0);
   const hasFetched = useRef(false);
 
-  const activeSection = SECTIONS[sectionIndex];
+  // Derive tabs from the actual sections returned — only those with content
+  const activeSections: { key: string; label: string }[] | null =
+    result?.chunkedResume
+      ? Object.entries(result.chunkedResume)
+          .filter(([, chunks]) => Array.isArray(chunks) && chunks.length > 0)
+          .map(([key]) => ({ key, label: labelFor(key) }))
+      : null;
+
+  const currentSection = activeSections?.[sectionIndex];
+  const chunks = currentSection
+    ? (result?.chunkedResume?.[currentSection.key] ?? [])
+    : [];
 
   useEffect(() => {
     if (!state?.file || !state?.jobTitle) {
@@ -51,16 +71,15 @@ export default function AnalysisPage() {
     hasFetched.current = true;
 
     analyzeResume(state.file, state.jobTitle, `Analyze my resume for a ${state.jobTitle} role`)
-      .then(data => { setResult(data); setLoading(false); })
+      .then(data => { setResult(data); setSectionIndex(0); setLoading(false); })
       .catch(err => { setError(err.message ?? 'Something went wrong.'); setLoading(false); });
   }, [state]);
 
   if (!state) return null;
 
-  const chunks = result?.chunkedResume?.[activeSection.key] ?? [];
-
+  const totalSections = activeSections?.length ?? 0;
   const goToPrev = () => setSectionIndex(i => Math.max(0, i - 1));
-  const goToNext = () => setSectionIndex(i => Math.min(SECTIONS.length - 1, i + 1));
+  const goToNext = () => setSectionIndex(i => Math.min(totalSections - 1, i + 1));
 
   return (
     <div className={styles.page}>
@@ -93,15 +112,22 @@ export default function AnalysisPage() {
         <aside className={styles.leftPanel}>
           {/* Section tabs */}
           <div className={styles.sectionTabs}>
-            {SECTIONS.map((s, i) => (
-              <button
-                key={s.key}
-                className={`${styles.sectionTab} ${i === sectionIndex ? styles.sectionTabActive : ''}`}
-                onClick={() => setSectionIndex(i)}
-              >
-                {s.label}
-              </button>
-            ))}
+            {loading || !activeSections ? (
+              // Skeleton tabs while waiting
+              [1, 2, 3, 4].map(n => (
+                <span key={n} className={styles.sectionTabSkeleton} style={{ width: `${50 + n * 12}px` }} />
+              ))
+            ) : (
+              activeSections.map((s, i) => (
+                <button
+                  key={s.key}
+                  className={`${styles.sectionTab} ${i === sectionIndex ? styles.sectionTabActive : ''}`}
+                  onClick={() => setSectionIndex(i)}
+                >
+                  {s.label}
+                </button>
+              ))
+            )}
           </div>
 
           {/* Chunk content */}
@@ -129,18 +155,14 @@ export default function AnalysisPage() {
                   <line x1="12" y1="8" x2="12" y2="12"/>
                   <line x1="12" y1="16" x2="12.01" y2="16"/>
                 </svg>
-                <p>No {activeSection.label.toLowerCase()} section found in your resume.</p>
+                <p>No {currentSection?.label.toLowerCase() ?? 'content'} found in your resume.</p>
               </div>
             )}
           </div>
 
           {/* Prev / Next navigation */}
           <div className={styles.chunkNav}>
-            <button
-              className={styles.navBtn}
-              onClick={goToPrev}
-              disabled={sectionIndex === 0}
-            >
+            <button className={styles.navBtn} onClick={goToPrev} disabled={loading || sectionIndex === 0}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="19" y1="12" x2="5" y2="12"/>
                 <polyline points="12 19 5 12 12 5"/>
@@ -149,15 +171,13 @@ export default function AnalysisPage() {
             </button>
 
             <span className={styles.navIndicator}>
-              {sectionIndex + 1} / {SECTIONS.length}
-              <span className={styles.navSectionName}>{activeSection.label}</span>
+              {loading ? '— / —' : `${sectionIndex + 1} / ${totalSections}`}
+              <span className={styles.navSectionName}>
+                {loading ? 'Loading…' : (currentSection?.label ?? '')}
+              </span>
             </span>
 
-            <button
-              className={styles.navBtn}
-              onClick={goToNext}
-              disabled={sectionIndex === SECTIONS.length - 1}
-            >
+            <button className={styles.navBtn} onClick={goToNext} disabled={loading || sectionIndex === totalSections - 1}>
               Next
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="5" y1="12" x2="19" y2="12"/>
