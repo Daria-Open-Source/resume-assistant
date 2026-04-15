@@ -19,5 +19,5 @@ export const runQuery = async (req, res) => {
         ModelRegistry.GROQ, null
     );
 
-    return res.status(200).json(data);
+    return res.status(200).json({ ...data, chunkedResume });
 };
