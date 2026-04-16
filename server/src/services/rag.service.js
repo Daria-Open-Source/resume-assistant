@@ -7,7 +7,7 @@ export class ResumeRagService {
     async queryStore(input, LLM, RankingAlgorithm) {
         
         // hard-coded limits for results
-        const NUM_SIMILAR = 2;
+        const NUM_SIMILAR = 5;
         // const NUM_BEST    = 5;
 
         // get the most similar results
@@ -18,6 +18,11 @@ export class ResumeRagService {
         
         // save array data to documents
         sections.forEach((section, index) => documents[section] = docArray[index])
+        console.log(input.chunkedResume);
+        console.log(documents);
+        
+        // remove the vector field
+        Object.values(documents).forEach(docArray => docArray.forEach(doc => doc.vec = null));
 
         /*
         // rank and take the top something
@@ -29,6 +34,8 @@ export class ResumeRagService {
 
         // prompt model and get response
         const { system, user } = PromptRegistry.RAG.GENERATE;
+
+        console.log(user({ 'role': input.role, 'query': input.query, 'resume': input.chunkedResume, documents }));
         const textResponse = await LLM.executePrompt(
             system(),
             user({ 'role': input.role, 'query': input.query, 'resume': input.chunkedResume, documents })
