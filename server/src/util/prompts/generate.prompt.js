@@ -6,7 +6,6 @@ export const system = (paramMapping) => {
         1. Perform a comparative analysis between each section of the user's resume and the "Gold Standard" examples, highlighting areas of alignment and deficiency between the candidate resume and the examples. 
         2. Propose resume advice and career advice on how to improve the the resume, drawing from results of the comparative analysis. Suggest courses, projects, or other opportunities that are within reach of the candidate's current strengths that would prepare them for a job.
         3. Finally give actionable advice on how they can improve their career outcomes.
-        4. When writing a response, USE DASHES OVER BULLET POINTS
 
         Maintain a professional, encouraging, and data-driven tone.
         
