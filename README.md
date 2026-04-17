@@ -19,6 +19,7 @@ We compare your resume to resumes from past students that have found success in 
 
 ## How we do it!
 We first take your provided resume, and break that up in pieces and extract the important information. We have a database of many past students who have found success in there desired field. We compare their accomplishments, skills and experiences listed on there resume and compare them to yours. After the comparison, we then list out the strengths and weaknesses of your resume, and we give actionable steps so they can address gaps. 
+
 ===
 ## Version
 v1.0 - 05.01.2026
