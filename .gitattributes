@@ -1,0 +1,5 @@
+# Normalize line endings for everyone
+* text=auto eol=lf
+
+# Force shell scripts to LF so husky hooks work on all platforms
+.husky/* text eol=lf
