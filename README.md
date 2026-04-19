@@ -12,7 +12,7 @@ A resume analysis tool for RPI students. It takes a resume and query, and provid
 
 ===
 ## Our Goal 
-Today finding success in a field is harder than ever, you are constantly competing with people for something that not long ago was a lot easier. Our goal is to help you succeed in your desired field by putting your best step forward buy helping with resume building, skill building, and career building. 
+Today finding success in a field is harder than ever, you are constantly competing with people for something that not long ago was a lot easier. Our goal is to help you succeed in your desired field by putting your best step forward by helping with resume building, skill building, and career building. 
 
 ## What we do !
 We compare your resume to resumes from past students that have found success in what you are looking for. We can help optimize your current resume by adjusting your resume based on the field of work you'd like to get into, while proposing new projects and skills to make you the prefect candidate for your dream job!
